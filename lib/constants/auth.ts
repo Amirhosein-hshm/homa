@@ -21,7 +21,7 @@ export const LOGIN_INFO: AuthInfo[] = [
 
 ];
 
-export const registerInfo: AuthInfo[] = [
+export const SIGN_UP_INFO: AuthInfo[] = [
   {
     id: uuidv4(),
     label: "ثبت‌نام سریع در کمتر از ۶۰ ثانیه",
