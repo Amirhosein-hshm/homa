@@ -2,28 +2,34 @@
 
 import { FormInputField } from "@/components/ui/FormInputField";
 import { Label } from "@/components/ui/label";
+import { LoginInput, loginSchema } from "@/lib/validation/login.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-type FakeLoginForm = {
-  userName: string;
-  password: string;
-};
+import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 
 export default function LoginForm() {
+  const loginResolver = zodResolver(
+    loginSchema as unknown as Parameters<typeof zodResolver>[0],
+  ) as unknown as Resolver<LoginInput>;
+
   const {
     control,
     handleSubmit,
     formState: { isValid },
-  } = useForm<FakeLoginForm>({
-    mode: "onChange",
+  } = useForm<LoginInput>({
+    mode: "onTouched",
+    resolver: loginResolver,
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit: SubmitHandler<FakeLoginForm> = async (data) => {
+  const onSubmit: SubmitHandler<LoginInput> = async (data) => {
     console.log(data);
   };
 
@@ -58,9 +64,9 @@ export default function LoginForm() {
       >
         <FormInputField
           id="username"
-          name="userName"
+          name="username"
           control={control}
-          label="ایمیل یا نام کاربری"
+          label=" نام کاربری"
           placeholder="مثال: johnDoe@gmail.com"
           autoComplete="username"
         />

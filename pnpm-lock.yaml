@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-gi+dr8SOth/IzqGYbC3ftTO3mUcWbcvI9rVj2IOCOHI=
+
 importers:
 
   .:
@@ -4620,6 +4622,7 @@ snapshots:
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.71.1(react@19.2.3)
+      zod: 4.3.6
 
   '@humanfs/core@0.19.1': {}
 
