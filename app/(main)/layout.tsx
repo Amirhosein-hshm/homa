@@ -7,10 +7,10 @@ export default async function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <MainHeader />
-      <main className="overflow-y-hidden my-2">{children}</main>
+      <main className="flex-1 overflow-y-hidden my-2">{children}</main>
       <MainFooter />
-    </>
+    </div>
   );
 }
