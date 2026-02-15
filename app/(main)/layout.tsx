@@ -9,9 +9,7 @@ export default async function MainLayout({
   return (
     <>
       <MainHeader />
-      <main className="flex-1  flex items-center justify-center overflow-y-hidden my-2">
-        {children}
-      </main>
+      <main className="overflow-y-hidden my-2">{children}</main>
       <MainFooter />
     </>
   );

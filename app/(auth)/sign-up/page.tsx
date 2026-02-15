@@ -1,5 +1,5 @@
-import SignUpForm from "@/components/pages/sign-up/SignUpform";
-import SignUpPanelInfo from "@/components/pages/sign-up/SignUpPanelInfo";
+import SignUpForm from "@/components/pages/auth/SignUpform";
+import SignUpPanelInfo from "@/components/pages/auth/SignUpPanelInfo";
 import { Card } from "@/components/ui/card";
 import { Metadata } from "next";
 
