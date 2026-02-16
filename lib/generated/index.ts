@@ -3,6 +3,5 @@
  * Do not edit manually.
  */
 export * from './endpoints';
-export * from './hooks';
 export * from './services';
 export * from './types';

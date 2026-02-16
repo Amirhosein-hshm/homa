@@ -1,3 +1,5 @@
+"use client";
+
 import type { ActionResult } from "@/lib/action/wrapper";
 import {
   DEFAULT_ERROR_MESSAGE,

@@ -15,6 +15,11 @@ export default defineConfig({
       client: "react-query",
       clean: true,
       indexFiles: true,
+      tsconfig: {
+        compilerOptions: {
+          target: "es2020",
+        },
+      },
       override: {
         mutator: {
           path: "../api/client.ts",
