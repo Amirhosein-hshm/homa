@@ -1,16 +1,13 @@
+import type { UserLogin } from "@/lib/generated/types/model";
 import { z } from "zod";
 
-export const loginSchema = z.object({
+export const loginSchema: z.ZodType<UserLogin> = z.object({
   username: z
     .string()
     .trim()
-    .nonempty({ message: "نام کاربری الزامی است." })
-    .regex(/^[a-zA-Z\s]+$/, {
-      message: "نام کاربری فقط می‌تواند شامل حروف انگلیسی  باشد.",
-    }),
-  password: z
-    .string()
-    .nonempty({ message: "رمز عبور الزامی است." }),
+    .min(1, { message: "نام کاربری الزامی است." })
+    .max(64, { message: "نام کاربری نمی‌تواند بیشتر از ۶۴ کاراکتر باشد." }),
+  password: z.string().min(1, { message: "رمز عبور الزامی است." }),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

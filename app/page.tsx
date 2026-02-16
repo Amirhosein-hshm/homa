@@ -1,5 +1,9 @@
-import { permanentRedirect } from "next/navigation";
+import { isAuthenticated } from "@/lib/api/session";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  permanentRedirect("/login");
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const loggedIn = await isAuthenticated();
+  redirect(loggedIn ? "/meets" : "/login");
 }

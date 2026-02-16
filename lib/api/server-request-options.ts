@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { getAuthorizationHeaderValue } from "./session";
 
 const headersInitToRecord = (input?: HeadersInit): Record<string, string> => {
   if (!input) return {};
@@ -19,15 +20,20 @@ export async function createServerRequestOptions(
 ): Promise<RequestInit> {
   const incomingHeaders = await headers();
   const forwardedHeaders: Record<string, string> = {};
+  const sessionAuthorization = await getAuthorizationHeaderValue();
 
   const cookie = incomingHeaders.get("cookie");
   if (cookie) {
     forwardedHeaders.cookie = cookie;
   }
 
-  const authorization = incomingHeaders.get("authorization");
-  if (authorization) {
-    forwardedHeaders.authorization = authorization;
+  if (sessionAuthorization) {
+    forwardedHeaders.authorization = sessionAuthorization;
+  } else {
+    const authorization = incomingHeaders.get("authorization");
+    if (authorization) {
+      forwardedHeaders.authorization = authorization;
+    }
   }
 
   return {

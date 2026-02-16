@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, isAxiosError } from "axios";
+import { DEFAULT_ERROR_MESSAGE, getStatusMessage } from "@/lib/constants/message";
 
 const normalizeBaseUrl = (value: string) =>
   value
@@ -28,6 +29,39 @@ const instance = axios.create({
   },
 });
 
+const TOAST_INTERCEPTOR_KEY = "__home_web_axios_toast_interceptor__";
+type AxiosToastWindow = Window & {
+  __home_web_axios_toast_interceptor__?: boolean;
+};
+
+const showClientErrorToast = (message: string) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  void import("sonner").then(({ toast }) => {
+    toast.error(message);
+  });
+};
+
+if (typeof window !== "undefined") {
+  const browserWindow = window as AxiosToastWindow;
+
+  if (!browserWindow[TOAST_INTERCEPTOR_KEY]) {
+    instance.interceptors.response.use(
+      (response) => response,
+      (error: unknown) => {
+        const status = isAxiosError(error) ? error.response?.status : undefined;
+        const message = getStatusMessage(status) || DEFAULT_ERROR_MESSAGE;
+        showClientErrorToast(message);
+        return Promise.reject(error);
+      },
+    );
+
+    browserWindow[TOAST_INTERCEPTOR_KEY] = true;
+  }
+}
+
 instance.interceptors.request.use((config) => {
   const hasJsonContentType =
     config.headers?.["Content-Type"] === "application/json";
@@ -40,7 +74,6 @@ instance.interceptors.request.use((config) => {
     (typeof config.data === "object" &&
       Object.keys(config.data as Record<string, unknown>).length === 0);
 
-  // Let the browser set multipart boundary automatically and avoid empty JSON bodies.
   if (hasJsonContentType && (isEmptyBody || isFormDataBody)) {
     delete (config.headers as Record<string, unknown>)["Content-Type"];
     delete config.data;
@@ -91,7 +124,6 @@ const toHeaders = (input: unknown): Headers => {
   return headers;
 };
 
-// Signature expected by Orval mutator with requestOptions: { type: "axios" }
 export const axiosInstance = async <T = unknown>(
   url: string,
   options?: RequestInit & {

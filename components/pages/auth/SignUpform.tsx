@@ -2,32 +2,60 @@
 
 import { FormInputField } from "@/components/ui/FormInputField";
 import { Label } from "@/components/ui/label";
+import { signUpAction } from "@/lib/action/auth";
+import { useServerAction } from "@/lib/generated/hooks/useServerAction";
+import {
+  type SignUpInput,
+  signUpSchema,
+} from "@/lib/validation/sign-up.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-type FakeLoginForm = {
-  fullName: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
-};
+import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 
 export default function SignUpForm() {
+  const router = useRouter();
+  const signUpResolver = zodResolver(
+    signUpSchema as unknown as Parameters<typeof zodResolver>[0],
+  ) as unknown as Resolver<SignUpInput>;
+
+  const { execute, isPending } = useServerAction(signUpAction, {
+    successMessage: "حساب کاربری با موفقیت ایجاد شد.",
+    onSuccess: (data) => {
+      router.replace(data.redirectTo);
+    },
+  });
+
   const {
     control,
     handleSubmit,
     formState: { isValid },
-  } = useForm<FakeLoginForm>({
-    mode: "onChange",
+  } = useForm<SignUpInput>({
+    mode: "onTouched",
+    resolver: signUpResolver,
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      username: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
-  const onSubmit: SubmitHandler<FakeLoginForm> = async (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<SignUpInput> = (data) => {
+    execute({
+      first_name: data.first_name,
+      last_name: data.last_name,
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -49,18 +77,34 @@ export default function SignUpForm() {
       </header>
 
       <form
-        id="loginForm"
+        id="signUpForm"
         className="space-y-4"
         onSubmit={handleSubmit(onSubmit)}
         noValidate
       >
         <FormInputField
-          id="fullName"
-          name="fullName"
+          id="first_name"
+          name="first_name"
           control={control}
-          label="نام و نام خانوادگی"
-          placeholder="مثال:جواد محمدی"
-          autoComplete="fullName"
+          label="نام"
+          placeholder="مثال: جواد"
+          autoComplete="given-name"
+        />
+        <FormInputField
+          id="last_name"
+          name="last_name"
+          control={control}
+          label="نام خانوادگی"
+          placeholder="مثال: محمدی"
+          autoComplete="family-name"
+        />
+        <FormInputField
+          id="username"
+          name="username"
+          control={control}
+          label="نام کاربری"
+          placeholder="مثال: javad.m"
+          autoComplete="username"
         />
         <FormInputField
           id="email"
@@ -92,17 +136,19 @@ export default function SignUpForm() {
             control={control}
             name="password"
             placeholder="حداقل ۸ کاراکتر"
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
         </div>
         <div className="flex flex-col gap-1 relative">
-          <Label htmlFor="pass" className="text-sm font-medium">
+          <Label htmlFor="passwordConfirm" className="text-sm font-medium">
             تأیید رمز عبور
           </Label>
 
           <button
             type="button"
-            aria-label={showPassword ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"}
+            aria-label={
+              showPasswordConfirm ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"
+            }
             className="absolute left-2 top-[50%]  text-slate-500 px-2 py-1 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             onClick={() => setShowPasswordConfirm((prev) => !prev)}
           >
@@ -115,17 +161,17 @@ export default function SignUpForm() {
             control={control}
             name="passwordConfirm"
             placeholder="حداقل ۸ کاراکتر"
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
         </div>
 
         <button
           type="submit"
           className="w-full inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium transition disabled:opacity-60"
-          disabled={!isValid}
-          aria-disabled={!isValid}
+          disabled={!isValid || isPending}
+          aria-disabled={!isValid || isPending}
         >
-          ایجاد حساب
+          {isPending ? "در حال ایجاد حساب..." : "ایجاد حساب"}
         </button>
       </form>
 

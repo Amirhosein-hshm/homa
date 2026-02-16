@@ -1,6 +1,16 @@
 import LoginForm from "@/components/pages/auth/LoginForm";
 import LoginInfoPanel from "@/components/pages/auth/LoginInfoPanel";
 import { Card } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ورود به سامانه",
+  description: "برای دسترسی به جلسات، وارد حساب کاربری خود شوید.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Login() {
   return (
