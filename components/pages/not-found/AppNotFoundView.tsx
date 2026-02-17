@@ -61,7 +61,7 @@ export default function AppNotFoundView({
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-rose-50 via-white to-red-50/40" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-rose-50 via-white to-red-50/40" />
       <div className="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 rounded-full bg-red-200/45 blur-3xl" />
       <div className="pointer-events-none absolute -left-24 bottom-6 -z-10 h-80 w-80 rounded-full bg-rose-200/40 blur-3xl" />
 
@@ -71,9 +71,7 @@ export default function AppNotFoundView({
             <SearchXIcon className="size-8" />
           </span>
 
-          <span
-            className="mx-auto inline-flex h-8 items-center rounded-full border border-red-200 bg-red-50 px-3 text-sm font-medium text-red-700"
-          >
+          <span className="mx-auto inline-flex h-8 items-center rounded-full border border-red-200 bg-red-50 px-3 text-sm font-medium text-red-700">
             خطای {code}
           </span>
 
