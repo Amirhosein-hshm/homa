@@ -1,7 +1,13 @@
 "use server";
 
-import { extractSessionToken, setSessionFromToken } from "@/lib/api/session";
+import { createServerRequestOptions } from "@/lib/api/server-request-options";
 import {
+  clearSession,
+  extractSessionToken,
+  setSessionFromToken,
+} from "@/lib/api/session";
+import {
+  actionSuccess,
   actionHandler,
   resolveActionResult,
   type ActionResult,
@@ -9,6 +15,7 @@ import {
 import {
   createUserApiUsersPost,
   loginApiAuthLoginPost,
+  logoutApiAuthLogoutPost,
 } from "@/lib/generated";
 import type { UserCreate, UserLogin } from "@/lib/generated/types/model";
 
@@ -78,4 +85,17 @@ export async function signUpAction(
     isSuccess: isSignUpSuccessResponse,
     mapSuccess: async () => ({ redirectTo: "/login" }),
   });
+}
+
+export async function logoutAction(): Promise<
+  ActionResult<{ redirectTo: string }>
+> {
+  try {
+    const request = await createServerRequestOptions();
+    await actionHandler(logoutApiAuthLogoutPost(request));
+  } finally {
+    await clearSession();
+  }
+
+  return actionSuccess({ redirectTo: "/login" }, 200);
 }

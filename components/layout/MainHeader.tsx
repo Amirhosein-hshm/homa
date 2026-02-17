@@ -1,6 +1,13 @@
+import MainHeaderProfile from "@/components/layout/MainHeaderProfile";
 import Link from "next/link";
 
 export default async function MainHeader() {
+  const fakeProfile = {
+    avatarSrc: "/images/avatar-user.svg",
+    fullName: "آرمان نیک‌خواه",
+    username: "arman.n",
+  };
+
   return (
     <header
       className="h-16 w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 bg-gray-50 border-b border-b-gray-200 "
@@ -30,6 +37,9 @@ export default async function MainHeader() {
               >
                 پشتیبانی
               </Link>
+            </li>
+            <li>
+              <MainHeaderProfile {...fakeProfile} />
             </li>
           </ul>
         </nav>
