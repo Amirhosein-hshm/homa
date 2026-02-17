@@ -76,8 +76,8 @@ function PaginationPrevious({
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
       {...props}
     >
-      <span className="hidden sm:block">قبلی</span>
       <ChevronLeftIcon />
+      <span className="hidden sm:block">قبلی</span>
     </PaginationLink>
   );
 }
@@ -93,8 +93,8 @@ function PaginationNext({
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       {...props}
     >
-      <ChevronRightIcon />
       <span className="hidden sm:block">بعدی</span>
+      <ChevronRightIcon />
     </PaginationLink>
   );
 }

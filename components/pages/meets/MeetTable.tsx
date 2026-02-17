@@ -1,88 +1,81 @@
 "use client";
 
-import { SmartTable } from "@/components/ui/SmartTable";
-import { ColumnDef } from "@tanstack/react-table";
 import MeetingTableActions from "./MeetTableAction";
+import { SmartTable } from "@/components/ui/SmartTable";
+import { useGetMeetsApiMeetsMeGet } from "@/lib/generated/hooks/meets";
+import type { GetMeetsApiMeetsMeGetParams, Meet } from "@/lib/generated/types";
+import { formatDateTimeFa } from "@/lib/helpers/date";
+import { ColumnDef } from "@tanstack/react-table";
+import { useSearchParams } from "next/navigation";
 
-type Meeting = {
-  id: string;
-  title: string;
-  participants: string;
-  date: string;
+type MeetingTableProps = {
+  initialQuery: GetMeetsApiMeetsMeGetParams;
 };
 
-const data: Meeting[] = [
-  {
-    id: "1",
-    title: "جلسه برنامه‌ریزی اسپرینت",
-    participants: "14",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-  {
-    id: "2",
-    title: "بازبینی کد (Code Review)",
-    participants: "6",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-  {
-    id: "3",
-    title: "جلسه هماهنگی تیم فرانت‌اند",
-    participants: "9",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-  {
-    id: "4",
-    title: "جلسه هماهنگی با بک‌اند",
-    participants: "7",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-  {
-    id: "5",
-    title: "جلسه تحلیل نیازمندی‌ها",
-    participants: "5",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-  { id: "6", title: "جلسه دمو محصول", participants: "18", date: "۱۴۰۴/۰۹/۰۷" },
-  {
-    id: "7",
-    title: "جلسه رفع باگ‌های بحرانی",
-    participants: "4",
-    date: "۱۴۰۴/۰۹/۰۷",
-  },
-];
+const MEETS_PAGE_SIZE = 12;
 
-const columns: ColumnDef<Meeting>[] = [
+const columns: ColumnDef<Meet>[] = [
   {
     accessorKey: "title",
     header: "عنوان جلسه",
   },
   {
-    accessorKey: "date",
+    accessorKey: "created_at",
     header: "زمان ایجاد",
+    cell: ({ row }) => formatDateTimeFa(row.original.created_at),
   },
   {
-    accessorKey: "",
+    accessorKey: "actions",
     header: "عملیات",
-    cell: () => <MeetingTableActions />,
+    cell: ({ row }) => <MeetingTableActions id={row.original.join_token} />,
   },
 ];
 
-export default function MeetingTable() {
+export default function MeetingTable({ initialQuery }: MeetingTableProps) {
+  const searchParams = useSearchParams();
+  const initialUiPage = Math.max((initialQuery.page ?? 1) - 1, 0);
+  const parsedUiPage = Number(searchParams.get("page") ?? initialUiPage);
+  const uiPage =
+    Number.isInteger(parsedUiPage) && parsedUiPage >= 0
+      ? parsedUiPage
+      : initialUiPage;
+  const apiPage = uiPage + 1;
+
+  const { data, isPending } = useGetMeetsApiMeetsMeGet(
+    { page: apiPage, size: MEETS_PAGE_SIZE },
+    {
+      request: {
+        credentials: "include",
+      },
+    },
+  );
+  const payload = data?.status === 200 ? data.data.payload : null;
+  const items = payload?.items ?? [];
+  const total = payload?.total ?? 0;
+
   return (
-    <SmartTable
-      columns={columns}
-      data={data}
-      title={
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm font-medium">همه جلسات</h2>
-          <span className="text-xs text-slate-500" id="resultLabel">
-            نمایش ۰
-          </span>
-        </div>
-      }
-      emptyMessage="جلسه‌ای‌ یافت نشد"
-      filterColumnKey="title"
-      filterPlaceholder="جستجو بر‌اساس عنوان جلسه"
-    />
+    <div className="h-full min-h-0 flex flex-col flex-1">
+      <div className="flex-1 min-h-0">
+        <SmartTable
+          columns={columns}
+          data={items}
+          paginationTotal={total}
+          paginationPageSize={MEETS_PAGE_SIZE}
+          title={
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-medium">همه جلسات</h2>
+              <span className="text-xs text-slate-500" id="resultLabel">
+                نمایش {total} جلسه
+              </span>
+            </div>
+          }
+          emptyMessage={
+            isPending ? "در حال دریافت جلسات..." : "جلسه‌ای‌ یافت نشد"
+          }
+          filterColumnKey="title"
+          filterPlaceholder="جستجو بر‌اساس عنوان جلسه"
+        />
+      </div>
+    </div>
   );
 }

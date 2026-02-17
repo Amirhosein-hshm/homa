@@ -12,9 +12,9 @@ export default async function MainLayout({
   await requireAuthenticated();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <MainHeader />
-      <main className="flex-1 overflow-y-hidden my-2">{children}</main>
+      <main className="flex-1 min-h-0 overflow-hidden flex py-2">{children}</main>
       <MainFooter />
     </div>
   );

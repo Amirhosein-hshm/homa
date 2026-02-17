@@ -50,6 +50,9 @@ export interface CustomDataTableProps<TData> {
   filterPlaceholder?: string;
   emptyMessage?: string;
   customButton?: React.ReactNode;
+  paginationTotal?: number;
+  paginationPageSize?: number;
+  paginationSiblingCount?: number;
 }
 
 export function SmartTable<TData>({
@@ -60,6 +63,9 @@ export function SmartTable<TData>({
   filterPlaceholder = "Filter...",
   emptyMessage = "No results found.",
   customButton,
+  paginationTotal,
+  paginationPageSize,
+  paginationSiblingCount,
 }: CustomDataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -100,8 +106,8 @@ export function SmartTable<TData>({
     : null;
 
   return (
-    <Card className="w-[96%] mx-auto border border-gray-300 rounded-sm  py-2 gap-4 h-full">
-      <div className="flex items-center justify-between gap-2  px-3 ">
+    <Card className="w-[96%] mx-auto border border-gray-300 rounded-sm py-0 gap-0 h-full min-h-0 overflow-hidden">
+      <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2">
         {title && (
           <h3 className="text-xs text-tint-blue-500 font-semibold my-1">
             {title}
@@ -130,51 +136,59 @@ export function SmartTable<TData>({
 
         {customButton}
       </div>
-      <Table>
-        <TableHeader className="border-t border-b">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className=" bg-slate-50 text-sm font-medium text-slate-500 uppercase text-center"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {data.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-slate-50 transition ">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className="text-xs px-6 py-4 text-slate-700 text-center"
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Table>
+          <TableHeader className="border-t border-b">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className=" bg-slate-50 text-sm font-medium text-slate-500 uppercase text-center"
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-12 text-center">
-                {emptyMessage}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <SmartPagination total={10} />{" "}
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {data.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50 transition ">
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="text-xs px-6 py-4 text-slate-700 text-center"
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-12 text-center">
+                  {emptyMessage}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="shrink-0 mt-auto">
+        <SmartPagination
+          total={paginationTotal ?? data.length}
+          pageSize={paginationPageSize}
+          siblingCount={paginationSiblingCount}
+        />
+      </div>
     </Card>
   );
 }

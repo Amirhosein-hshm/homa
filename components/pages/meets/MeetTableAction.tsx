@@ -5,11 +5,11 @@ import { useClipboard } from "@/lib/hooks/useClipboard";
 import { Copy, Merge } from "lucide-react";
 import Link from "next/link";
 
-export default function MeetingTableActions() {
+export default function MeetingTableActions({ id }: { id: string }) {
   const { copy } = useClipboard();
 
   const handleCopyClick = async () => {
-    await copy("https://example.com/meeting/123");
+    await copy(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${id}`);
   };
 
   return (
@@ -29,7 +29,7 @@ export default function MeetingTableActions() {
         title="ورود به جلسه "
         element={
           <Link
-            href="/room/123"
+            href={`/room/${id}`}
             className="
     inline-flex items-center
     rounded-md
@@ -43,7 +43,7 @@ export default function MeetingTableActions() {
     focus:outline-none
     focus:ring-2
     focus:ring-indigo-500
-    focus:ring-offset-2
+    focus:ring-offset-2 cursor-pointer
   "
           >
             <Merge size={16} className="text stroke-indigo-600" />

@@ -24,9 +24,12 @@ export function SmartPagination({
 }: TablePaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pageNumberFormatter = new Intl.NumberFormat("fa-IR");
 
   const currentParams = new URLSearchParams(searchParams?.toString() || "");
-  const currentPage = Number(currentParams.get("page")) || 0;
+  const parsedPage = Number(currentParams.get("page"));
+  const currentPage =
+    Number.isInteger(parsedPage) && parsedPage >= 0 ? parsedPage : 0;
   const totalPages = Math.ceil(total / pageSize);
 
   const handlePageChange = (newPage: number) => {
@@ -56,18 +59,18 @@ export function SmartPagination({
 
   return (
     <Pagination
-      className=" py-3 flex justify-center rtl border-t"
+      className=" py-3 flex justify-center border-t"
       aria-label="Table Pagination"
     >
-      <PaginationContent>
+      <PaginationContent dir="ltr">
         <PaginationItem>
           <button
-            disabled={currentPage + 1 >= totalPages}
+            disabled={currentPage === 0}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <PaginationNext
+            <PaginationPrevious
               className="font-medium text-xs"
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
             />
           </button>
         </PaginationItem>
@@ -78,13 +81,13 @@ export function SmartPagination({
               <PaginationEllipsis />
             </PaginationItem>
           ) : (
-            <PaginationItem key={page} className="flex flex-row-reverse">
+            <PaginationItem key={page}>
               <PaginationLink
                 isActive={page === currentPage}
                 onClick={() => handlePageChange(page)}
                 className="transition w-fit h-fit p-1 px-2 flex items-center justify-center hover:bg-blue-50 leading-6 cursor-pointer font-medium text-xs"
               >
-                {page + 1}
+                {pageNumberFormatter.format(page + 1)}
               </PaginationLink>
             </PaginationItem>
           ),
@@ -92,12 +95,12 @@ export function SmartPagination({
 
         <PaginationItem>
           <button
-            disabled={currentPage === 0}
+            disabled={currentPage + 1 >= totalPages}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <PaginationPrevious
+            <PaginationNext
               className="font-medium text-xs"
-              onClick={() => handlePageChange(currentPage - 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
             />
           </button>
         </PaginationItem>
