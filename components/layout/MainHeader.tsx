@@ -1,12 +1,9 @@
+import { getCurrentUserProfile } from "@/lib/api/current-user";
 import MainHeaderProfile from "@/components/layout/MainHeaderProfile";
 import Link from "next/link";
 
 export default async function MainHeader() {
-  const fakeProfile = {
-    avatarSrc: "/images/avatar-user.svg",
-    fullName: "آرمان نیک‌خواه",
-    username: "arman.n",
-  };
+  const profile = await getCurrentUserProfile();
 
   return (
     <header
@@ -39,7 +36,7 @@ export default async function MainHeader() {
               </Link>
             </li>
             <li>
-              <MainHeaderProfile {...fakeProfile} />
+              <MainHeaderProfile {...profile} />
             </li>
           </ul>
         </nav>
