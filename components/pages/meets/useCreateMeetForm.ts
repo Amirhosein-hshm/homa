@@ -7,16 +7,12 @@ import {
   type CreateMeetInput,
 } from "@/lib/validation/create-meet.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
 
-const MEETS_QUERY_KEY = ["/api/meets/me"] as const;
-
 export function useCreateMeetForm() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const createMeetResolver = zodResolver(
     createMeetSchema as unknown as Parameters<typeof zodResolver>[0],
@@ -40,7 +36,6 @@ export function useCreateMeetForm() {
     onSuccess: () => {
       setOpen(false);
       reset({ title: "" });
-      void queryClient.invalidateQueries({ queryKey: [...MEETS_QUERY_KEY] });
       router.refresh();
     },
   });
