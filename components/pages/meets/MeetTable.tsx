@@ -1,13 +1,13 @@
 "use client";
 
-import CreateMeetModal from "./CreateMeetModal";
-import MeetingTableActions from "./MeetTableAction";
 import { SmartTable } from "@/components/ui/SmartTable";
 import { useGetMeetsApiMeetsMeGet } from "@/lib/generated/hooks/meets";
 import type { GetMeetsApiMeetsMeGetParams, Meet } from "@/lib/generated/types";
 import { formatDateTimeFa } from "@/lib/helpers/date";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
+import CreateMeetModal from "./CreateMeetModal";
+import MeetingTableActions from "./MeetTableAction";
 
 type MeetingTableProps = {
   initialQuery: GetMeetsApiMeetsMeGetParams;
@@ -46,8 +46,6 @@ export default function MeetingTable({ initialQuery }: MeetingTableProps) {
     { page: apiPage, size: MEETS_PAGE_SIZE },
     {
       query: {
-        // Meets data is prefetched on the server with authenticated headers.
-        // Keep client query disabled to avoid unauthorized browser calls.
         enabled: false,
       },
     },
