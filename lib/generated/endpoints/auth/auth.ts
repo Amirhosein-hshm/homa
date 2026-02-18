@@ -25,7 +25,6 @@ import type {
 
 import type {
   HTTPValidationError,
-  StandardResponseListPermission,
   StandardResponseNoneType,
   StandardResponseToken,
   StandardResponseUser,
@@ -304,118 +303,6 @@ export const useLogoutApiAuthLogoutPost = <TError = unknown,
       return useMutation(getLogoutApiAuthLogoutPostMutationOptions(options), queryClient);
     }
     /**
- * Return all permissions with their associated policy objects from the JSON files.
- * @summary Get Permissions
- */
-export type getPermissionsApiAuthPermissionsGetResponse200 = {
-  data: StandardResponseListPermission
-  status: 200
-}
-    
-export type getPermissionsApiAuthPermissionsGetResponseSuccess = (getPermissionsApiAuthPermissionsGetResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getPermissionsApiAuthPermissionsGetResponse = (getPermissionsApiAuthPermissionsGetResponseSuccess)
-
-export const getGetPermissionsApiAuthPermissionsGetUrl = () => {
-
-
-  
-
-  return `/api/auth/permissions`
-}
-
-export const getPermissionsApiAuthPermissionsGet = async ( options?: RequestInit): Promise<getPermissionsApiAuthPermissionsGetResponse> => {
-  
-  return axiosInstance<getPermissionsApiAuthPermissionsGetResponse>(getGetPermissionsApiAuthPermissionsGetUrl(),
-  {
-      type: 'axios',
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetPermissionsApiAuthPermissionsGetQueryKey = () => {
-    return [
-    `/api/auth/permissions`
-    ] as const;
-    }
-
-    
-export const getGetPermissionsApiAuthPermissionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetPermissionsApiAuthPermissionsGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>> = ({ signal }) => getPermissionsApiAuthPermissionsGet({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetPermissionsApiAuthPermissionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>>
-export type GetPermissionsApiAuthPermissionsGetQueryError = unknown
-
-
-export function useGetPermissionsApiAuthPermissionsGet<TData = Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPermissionsApiAuthPermissionsGet<TData = Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPermissionsApiAuthPermissionsGet<TData = Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get Permissions
- */
-
-export function useGetPermissionsApiAuthPermissionsGet<TData = Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPermissionsApiAuthPermissionsGet>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetPermissionsApiAuthPermissionsGetQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-/**
  * @summary Get Me
  */
 export type getMeApiAuthMeGetResponse200 = {
