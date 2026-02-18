@@ -1,5 +1,11 @@
 "use server";
 
+import {
+  actionHandler,
+  actionSuccess,
+  resolveActionResult,
+  type ActionResult,
+} from "@/lib/action/wrapper";
 import { createServerRequestOptions } from "@/lib/api/server-request-options";
 import {
   clearSession,
@@ -7,15 +13,9 @@ import {
   setSessionFromToken,
 } from "@/lib/api/session";
 import {
-  actionSuccess,
-  actionHandler,
-  resolveActionResult,
-  type ActionResult,
-} from "@/lib/action/wrapper";
-import {
-  createUserApiUsersPost,
   loginApiAuthLoginPost,
   logoutApiAuthLogoutPost,
+  registerUserApiUsersRegisterPost,
 } from "@/lib/generated";
 import type { UserCreate, UserLogin } from "@/lib/generated/types/model";
 
@@ -32,7 +32,9 @@ const isLoginSuccessResponse = (
 ): response is LoginSuccessResponse =>
   response.status === 200 && response.data.success;
 
-type SignUpResponse = Awaited<ReturnType<typeof createUserApiUsersPost>>;
+type SignUpResponse = Awaited<
+  ReturnType<typeof registerUserApiUsersRegisterPost>
+>;
 type SignUpSuccessResponse = Extract<SignUpResponse, { status: 200 }>;
 
 const isSignUpSuccessResponse = (
@@ -78,7 +80,7 @@ export async function signUpAction(
   payload: UserCreate,
 ): Promise<ActionResult<{ redirectTo: string }>> {
   const signUpResult = await actionHandler(
-    createUserApiUsersPost(buildSignUpInput(payload)),
+    registerUserApiUsersRegisterPost(buildSignUpInput(payload)),
   );
 
   return resolveActionResult(signUpResult, {
