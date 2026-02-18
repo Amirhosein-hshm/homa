@@ -70,7 +70,7 @@ export default function MainHeaderProfile({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="justify-end"
+          className="justify-end cursor-pointer"
           variant="destructive"
           disabled={isPending}
           onSelect={(event) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import CreateMeetModal from "./CreateMeetModal";
 import MeetingTableActions from "./MeetTableAction";
 import { SmartTable } from "@/components/ui/SmartTable";
 import { useGetMeetsApiMeetsMeGet } from "@/lib/generated/hooks/meets";
@@ -61,6 +62,7 @@ export default function MeetingTable({ initialQuery }: MeetingTableProps) {
           data={items}
           paginationTotal={total}
           paginationPageSize={MEETS_PAGE_SIZE}
+          customButton={<CreateMeetModal />}
           title={
             <div className="flex items-center gap-3">
               <h2 className="text-sm font-medium">همه جلسات</h2>
