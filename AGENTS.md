@@ -320,13 +320,481 @@ When implementing features that fetch collections of data (e.g., list views, pag
 
 ---
 
-## Agent Instructions
+## AGENTS.md — LiveKit React Integration Guide
 
-This document serves as the single source of truth for AI agents working on this codebase. Before making changes:
+> **IMPORTANT:** This project uses **LiveKit** as the real-time meeting infrastructure. Any page or feature that requires audio/video conferencing, screen sharing, participant management, meeting rooms, chat, or real-time communication **must use LiveKit React Components** instead of creating custom WebRTC implementations.
 
-1. Read this file to understand conventions.
-2. Explore the specific area of the codebase you're modifying.
-3. Follow the established patterns — especially View/Logic separation, Orval usage, and the `ActionResult` pattern.
-4. Run `pnpm lint` after any changes.
-5. Do not add explanatory comments to code.
-6. Do not create documentation files unless explicitly asked.
+### Official Documentation
+
+Primary reference:
+
+- [LiveKit React Components Documentation](https://docs.livekit.io/reference/components/react/?utm_source=chatgpt.com)
+
+Before implementing any meeting-related functionality, always review the official documentation and prefer official LiveKit components over custom implementations.
+
+---
+
+# LiveKit Infrastructure
+
+## LiveKit Server
+
+The project includes a self-hosted LiveKit server.
+
+Default server URL:
+
+```env
+NEXT_PUBLIC_LIVEKIT_URL=http://localhost:7880
+```
+
+Docker service:
+
+```yaml
+livekit:
+  ports:
+    - "7880:7880"
+```
+
+The frontend must connect to this server when joining rooms.
+
+Example:
+
+```tsx
+<LiveKitRoom
+  token={token}
+  serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+  connect
+>
+  ...
+</LiveKitRoom>
+```
+
+---
+
+# Meeting Authentication
+
+## Token Endpoint
+
+Meeting access tokens must always be requested from the backend.
+
+Generated Orval API endpoint:
+
+```http
+POST /meets/{meet_hash}/token
+```
+
+Example flow:
+
+```ts
+const token = await meetsApi.meetsTokenCreate(meetHash);
+```
+
+or via generated React Query hooks:
+
+```ts
+const mutation = useMeetsTokenCreate();
+
+mutation.mutate({
+  meetHash,
+});
+```
+
+### Rules
+
+- Never generate LiveKit tokens on the frontend.
+- Never hardcode tokens.
+- Always obtain a fresh token from:
+
+```http
+POST /meets/{meet_hash}/token
+```
+
+- Use the generated Orval client whenever available.
+- Respect the existing API layer patterns already used in the project.
+
+---
+
+# Required Packages
+
+Install and use official LiveKit packages:
+
+```bash
+pnpm add livekit-client
+pnpm add @livekit/components-react
+```
+
+or
+
+```bash
+npm install livekit-client @livekit/components-react
+```
+
+Do not introduce alternative WebRTC libraries unless explicitly requested.
+
+---
+
+# Recommended Room Architecture
+
+For meeting pages use:
+
+```tsx
+<LiveKitRoom>
+  <VideoConference />
+  <RoomAudioRenderer />
+</LiveKitRoom>
+```
+
+Minimal example:
+
+```tsx
+<LiveKitRoom video audio connect token={token} serverUrl={serverUrl}>
+  <VideoConference />
+  <RoomAudioRenderer />
+</LiveKitRoom>
+```
+
+This should be considered the default implementation.
+
+---
+
+# Core Components
+
+## LiveKitRoom
+
+Primary room provider.
+
+Responsibilities:
+
+- Room connection
+- Participant lifecycle
+- Media publishing
+- Reconnection handling
+- Event management
+
+Example:
+
+```tsx
+<LiveKitRoom token={token} serverUrl={serverUrl} connect>
+  {children}
+</LiveKitRoom>
+```
+
+---
+
+## VideoConference
+
+Preferred full-featured meeting UI.
+
+Includes:
+
+- Participant grid
+- Active speaker handling
+- Responsive layouts
+- Media management
+- Room controls integration
+
+Example:
+
+```tsx
+<VideoConference />
+```
+
+Use whenever a complete meeting experience is required.
+
+---
+
+## RoomAudioRenderer
+
+Required for remote audio playback.
+
+Example:
+
+```tsx
+<RoomAudioRenderer />
+```
+
+Always include it inside meeting rooms.
+
+---
+
+## ControlBar
+
+Provides built-in meeting controls.
+
+Features:
+
+- Mute / unmute microphone
+- Camera on/off
+- Screen sharing
+- Leave room
+
+Example:
+
+```tsx
+<ControlBar />
+```
+
+---
+
+## Chat
+
+Built-in room chat.
+
+Example:
+
+```tsx
+<Chat />
+```
+
+Use when room messaging is required.
+
+---
+
+## ParticipantTile
+
+Displays a participant.
+
+Features:
+
+- Video stream
+- Audio status
+- Speaking indicators
+- Connection state
+
+Example:
+
+```tsx
+<ParticipantTile participant={participant} />
+```
+
+---
+
+## GridLayout
+
+Participant grid layout.
+
+Example:
+
+```tsx
+<GridLayout tracks={tracks}>
+  <ParticipantTile />
+</GridLayout>
+```
+
+Use for custom room UIs.
+
+---
+
+# Meeting Features
+
+The meeting implementation should support:
+
+### Audio
+
+- Mute microphone
+- Unmute microphone
+- Device switching
+- Permission handling
+
+### Video
+
+- Camera enable
+- Camera disable
+- Camera switching
+- Video quality management
+
+### Screen Sharing
+
+- Start screen share
+- Stop screen share
+- Screen share participant highlighting
+
+### Chat
+
+- Real-time messaging
+- Participant communication
+
+### Participants
+
+- Join room
+- Leave room
+- Participant count
+- Active speaker detection
+
+### Reconnection
+
+- Network recovery
+- Automatic reconnect support
+
+### Device Management
+
+- Microphone selection
+- Camera selection
+- Speaker selection
+
+---
+
+# Moderator Features
+
+Some meetings may require moderator capabilities.
+
+Potential moderator actions:
+
+### Remove Participant
+
+Using LiveKit Room APIs:
+
+```ts
+room.remoteParticipants;
+```
+
+and backend moderation endpoints when available.
+
+### Mute Participant
+
+Moderators may mute participants through LiveKit APIs.
+
+### Role-Based Controls
+
+Implement permission-based UI:
+
+```ts
+isModerator;
+isHost;
+isParticipant;
+```
+
+Examples:
+
+```tsx
+{
+  isModerator && <RemoveParticipantButton />;
+}
+```
+
+Never expose moderator actions to normal participants.
+
+---
+
+# Room Page Standards
+
+Every room page should:
+
+### Before Join
+
+1. Load room information.
+2. Request LiveKit token.
+3. Show loading state.
+4. Handle API errors.
+
+### During Meeting
+
+1. Connect to LiveKit.
+2. Render conference UI.
+3. Render audio.
+4. Handle reconnection.
+5. Handle participant changes.
+
+### After Leave
+
+1. Disconnect room.
+2. Clear local state.
+3. Navigate away if required.
+
+---
+
+# Next.js 16 Guidelines
+
+Meeting pages must be implemented as Client Components.
+
+Example:
+
+```tsx
+"use client";
+```
+
+Reasons:
+
+- Camera access
+- Microphone access
+- Browser APIs
+- LiveKit client requirements
+
+Avoid SSR for LiveKit room components.
+
+Use dynamic imports if necessary:
+
+```tsx
+dynamic(() => import("./MeetingRoom"), {
+  ssr: false,
+});
+```
+
+---
+
+# AI Agent Implementation Rules
+
+Whenever a task mentions:
+
+- meeting
+- conference
+- room
+- video call
+- audio call
+- webinar
+- screen sharing
+- participants
+- video chat
+
+The agent must:
+
+1. Use LiveKit.
+2. Read this AGENTS.md section.
+3. Use official LiveKit React Components.
+4. Request tokens via:
+
+```http
+POST /meets/{meet_hash}/token
+```
+
+5. Use the generated Orval API client.
+6. Connect to:
+
+```env
+NEXT_PUBLIC_LIVEKIT_URL
+```
+
+7. Prefer:
+
+```tsx
+<VideoConference />
+```
+
+8. Include:
+
+```tsx
+<RoomAudioRenderer />
+```
+
+9. Support microphone, camera, screen sharing, and participant management.
+10. Follow existing project architecture and coding standards.
+
+---
+
+# Preferred Full Meeting Template
+
+```tsx
+<LiveKitRoom
+  token={token}
+  serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+  connect
+  video
+  audio
+>
+  <VideoConference />
+  <RoomAudioRenderer />
+</LiveKitRoom>
+```
+
+This template should be the default starting point for any meeting-related page.
+
+---
