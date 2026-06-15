@@ -152,7 +152,7 @@ export async function setSessionFromToken(
   const cookieStore = await cookies();
 
   cookieStore.set(ACCESS_TOKEN_COOKIE, token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: isProduction,
     sameSite: "lax",
     path: "/",
@@ -160,7 +160,7 @@ export async function setSessionFromToken(
   });
 
   cookieStore.set(TOKEN_TYPE_COOKIE, tokenType, {
-    httpOnly: true,
+    httpOnly: false,
     secure: isProduction,
     sameSite: "lax",
     path: "/",

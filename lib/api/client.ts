@@ -1,5 +1,12 @@
-import axios, { AxiosRequestConfig, InternalAxiosRequestConfig, isAxiosError } from "axios";
-import { DEFAULT_ERROR_MESSAGE, getStatusMessage } from "@/lib/constants/message";
+import axios, {
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+  isAxiosError,
+} from "axios";
+import {
+  DEFAULT_ERROR_MESSAGE,
+  getStatusMessage,
+} from "@/lib/constants/message";
 
 const normalizeBaseUrl = (value: string) =>
   value
@@ -117,17 +124,24 @@ if (typeof window !== "undefined") {
         if (!originalRequest) {
           return Promise.reject(error);
         }
-        if ((originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })._retry) {
+        if (
+          (originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })
+            ._retry
+        ) {
           return Promise.reject(error);
         }
 
         if (isRefreshing) {
-          return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject });
-          }).then(() => instance(originalRequest));
+          return new Promise<string | null>((resolve, reject) => {
+            failedQueue.push({ resolve: resolve as (value: unknown) => void, reject });
+          })
+            .then(() => instance(originalRequest))
+            .catch((queueError) => Promise.reject(queueError));
         }
 
-        (originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })._retry = true;
+        (
+          originalRequest as InternalAxiosRequestConfig & { _retry?: boolean }
+        )._retry = true;
         isRefreshing = true;
 
         try {
@@ -159,7 +173,16 @@ if (typeof window !== "undefined") {
     instance.interceptors.response.use(
       (response) => response,
       (error: unknown) => {
-        if (isAxiosError(error) && error.config && (error.config as InternalAxiosRequestConfig & { _retry?: boolean })._retry) {
+        if (isAxiosError(error) && error.response?.status === 401) {
+          return Promise.reject(error);
+        }
+
+        if (
+          isAxiosError(error) &&
+          error.config &&
+          (error.config as InternalAxiosRequestConfig & { _retry?: boolean })
+            ._retry
+        ) {
           return Promise.reject(error);
         }
 
@@ -172,6 +195,32 @@ if (typeof window !== "undefined") {
     browserWindow[TOAST_INTERCEPTOR_KEY] = true;
   }
 }
+
+const getClientCookie = (name: string): string | null => {
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const eqIdx = cookie.indexOf("=");
+    if (eqIdx === -1) continue;
+    const key = cookie.slice(0, eqIdx).trim();
+    if (key === name) {
+      return decodeURIComponent(cookie.slice(eqIdx + 1).trim());
+    }
+  }
+  return null;
+};
+
+instance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = getClientCookie("access_token");
+    if (token) {
+      const tokenType = getClientCookie("token_type") ?? "Bearer";
+      config.headers.Authorization = `${tokenType} ${token}`;
+    }
+  }
+
+  return config;
+});
 
 instance.interceptors.request.use((config) => {
   const hasJsonContentType =
