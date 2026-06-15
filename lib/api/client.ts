@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, isAxiosError } from "axios";
+import axios, { AxiosRequestConfig, InternalAxiosRequestConfig, isAxiosError } from "axios";
 import { DEFAULT_ERROR_MESSAGE, getStatusMessage } from "@/lib/constants/message";
 
 const normalizeBaseUrl = (value: string) =>
@@ -114,7 +114,10 @@ if (typeof window !== "undefined") {
         }
 
         const originalRequest = error.config;
-        if (!originalRequest || (originalRequest as Record<string, unknown>)._retry) {
+        if (!originalRequest) {
+          return Promise.reject(error);
+        }
+        if ((originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })._retry) {
           return Promise.reject(error);
         }
 
@@ -124,7 +127,7 @@ if (typeof window !== "undefined") {
           }).then(() => instance(originalRequest));
         }
 
-        (originalRequest as Record<string, unknown>)._retry = true;
+        (originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })._retry = true;
         isRefreshing = true;
 
         try {
@@ -156,7 +159,7 @@ if (typeof window !== "undefined") {
     instance.interceptors.response.use(
       (response) => response,
       (error: unknown) => {
-        if (isAxiosError(error) && error.config && (error.config as Record<string, unknown>)._retry) {
+        if (isAxiosError(error) && error.config && (error.config as InternalAxiosRequestConfig & { _retry?: boolean })._retry) {
           return Promise.reject(error);
         }
 

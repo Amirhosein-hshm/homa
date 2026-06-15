@@ -2,6 +2,7 @@ import {
   refreshTokenUsersRefreshPost,
   type RefreshTokenRequestDTO,
 } from "@/lib/generated";
+import type { refreshTokenUsersRefreshPostResponse200 } from "@/lib/generated/endpoints/users/users";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import "server-only";
@@ -220,13 +221,10 @@ export async function refreshSessionFromServer(
       return null;
     }
 
-    const data = refreshResult.data as Record<string, unknown>;
+    const successResponse = refreshResult as refreshTokenUsersRefreshPostResponse200;
+    const { access_token, refresh_token, token_type } = successResponse.data;
     const sessionToken = extractSessionToken(
-      {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        token_type: data.token_type,
-      },
+      { access_token, refresh_token, token_type },
       null,
     );
 

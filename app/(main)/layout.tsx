@@ -1,5 +1,6 @@
 import MainFooter from "@/components/layout/mainFooter";
 import MainHeader from "@/components/layout/MainHeader";
+import Sidebar from "@/components/layout/Sidebar";
 import { requireAuthenticated } from "@/lib/api/session";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,10 @@ export default async function MainLayout({
   return (
     <div className="h-screen flex flex-col">
       <MainHeader />
-      <main className="flex-1 min-h-0 overflow-hidden flex py-2">{children}</main>
+      <div className="flex-1 min-h-0 overflow-hidden flex py-2">
+        <Sidebar />
+        <main className="flex-1 min-h-0 overflow-y-auto p-4">{children}</main>
+      </div>
       <MainFooter />
     </div>
   );

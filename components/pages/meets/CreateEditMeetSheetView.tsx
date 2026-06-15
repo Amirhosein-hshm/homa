@@ -1,0 +1,105 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { FormInputField } from "@/components/ui/FormInputField";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import type { CreateEditMeetFormController } from "./useCreateEditMeetForm";
+
+type CreateEditMeetSheetViewProps = CreateEditMeetFormController & {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  isEditMode: boolean;
+  isLoadingDetail: boolean;
+};
+
+export default function CreateEditMeetSheetView({
+  control,
+  isPending,
+  isValid,
+  open,
+  onOpenChange,
+  onSubmit,
+  isEditMode,
+  isLoadingDetail,
+  resetForm,
+}: CreateEditMeetSheetViewProps) {
+  const handleClose = () => {
+    if (isPending) return;
+    resetForm();
+    onOpenChange(false);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={handleClose}>
+      <SheetContent side="right" className="w-full sm:max-w-lg">
+        <SheetHeader>
+          <SheetTitle>{isEditMode ? "ویرایش جلسه" : "ایجاد جلسه جدید"}</SheetTitle>
+          <SheetDescription>
+            {isEditMode
+              ? "اطلاعات جلسه را ویرایش کنید."
+              : "اطلاعات جلسه جدید را وارد کنید."}
+          </SheetDescription>
+        </SheetHeader>
+
+        {isEditMode && isLoadingDetail ? (
+          <div className="flex items-center justify-center py-12 text-sm text-slate-500">
+            در حال دریافت اطلاعات جلسه...
+          </div>
+        ) : (
+          <form id="meetForm" onSubmit={onSubmit} noValidate className="flex flex-col gap-4 px-4 py-2">
+            <FormInputField
+              id="title"
+              name="title"
+              control={control}
+              label="عنوان جلسه"
+              placeholder="مثال: جلسه برنامه‌ریزی هفتگی"
+              autoComplete="off"
+            />
+            <FormInputField
+              id="start_time"
+              name="start_time"
+              control={control}
+              label="زمان شروع"
+              type="datetime-local"
+            />
+            <FormInputField
+              id="expires_at"
+              name="expires_at"
+              control={control}
+              label="زمان انقضا"
+              type="datetime-local"
+            />
+            <FormInputField
+              id="guest_usernames"
+              name="guest_usernames"
+              control={control}
+              label="نام کاربری مهمانان"
+              placeholder="username1, username2, username3"
+              autoComplete="off"
+            />
+          </form>
+        )}
+
+        <SheetFooter>
+          <Button type="button" variant="outline" disabled={isPending} onClick={handleClose}>
+            انصراف
+          </Button>
+          <Button
+            form="meetForm"
+            type="submit"
+            disabled={!isValid || isPending || isLoadingDetail}
+          >
+            {isPending ? "در حال ذخیره..." : isEditMode ? "ویرایش جلسه" : "ایجاد جلسه"}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}

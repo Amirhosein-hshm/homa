@@ -1,10 +1,8 @@
 "use client";
 
 import { setAuthSessionAction } from "@/lib/action/auth";
-import {
-  useLoginUserUsersLoginPost,
-  type LoginUserUsersLoginPostMutationResult,
-} from "@/lib/generated/hooks";
+import { useLoginUserUsersLoginPost } from "@/lib/generated/hooks";
+import type { LoginUserUsersLoginPostMutationResult } from "@/lib/generated/endpoints/users/users";
 import { type LoginInput, loginSchema } from "@/lib/validation/login.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
