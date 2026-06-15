@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface LiveKitTokenData {
+  token: string;
+  room_name: string;
+}

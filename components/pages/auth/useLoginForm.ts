@@ -1,12 +1,16 @@
 "use client";
 
-import { loginAction } from "@/lib/action/auth";
-import { useServerAction } from "@/lib/generated/hooks/useServerAction";
+import { setAuthSessionAction } from "@/lib/action/auth";
+import {
+  useLoginUserUsersLoginPost,
+  type LoginUserUsersLoginPostMutationResult,
+} from "@/lib/generated/hooks";
 import { type LoginInput, loginSchema } from "@/lib/validation/login.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function useLoginForm() {
   const router = useRouter();
@@ -15,10 +19,30 @@ export function useLoginForm() {
     loginSchema as unknown as Parameters<typeof zodResolver>[0],
   ) as unknown as Resolver<LoginInput>;
 
-  const { execute, isPending } = useServerAction(loginAction, {
-    successMessage: "ورود با موفقیت انجام شد.",
-    onSuccess: (data) => {
-      router.replace(data.redirectTo);
+  const { mutateAsync, isPending } = useLoginUserUsersLoginPost({
+    mutation: {
+      onSuccess: async (response: LoginUserUsersLoginPostMutationResult) => {
+        if (response.status !== 200) {
+          return;
+        }
+
+        const data = response.data as {
+          access_token: string;
+          refresh_token: string;
+          token_type: string;
+        };
+
+        const result = await setAuthSessionAction({
+          token: data.access_token,
+          refresh_token: data.refresh_token,
+          type: data.token_type || "Bearer",
+        });
+
+        if (result.success) {
+          toast.success("ورود با موفقیت انجام شد.");
+          router.replace("/meets");
+        }
+      },
     },
   });
 
@@ -36,7 +60,7 @@ export function useLoginForm() {
   });
 
   const onValidSubmit: SubmitHandler<LoginInput> = (data) => {
-    execute(data);
+    mutateAsync({ data: { username: data.username, password: data.password } });
   };
 
   return {

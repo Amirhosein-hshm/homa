@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface BanParticipantResponseData {
+  meet_hash: string;
+  user_id: number;
+  banned: boolean;
+}

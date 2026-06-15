@@ -5,8 +5,10 @@
  * Clean Architecture implementation with FastAPI
  * OpenAPI spec version: 1.0.0
  */
-import type { ValidationError } from './validationError';
+import type { MeetResponseData } from './meetResponseData';
 
-export interface HTTPValidationError {
-  detail?: ValidationError[];
+export interface MutationResponseDTOMeetResponseData {
+  data: MeetResponseData;
+  message: string;
+  detail?: string | null;
 }

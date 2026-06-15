@@ -6,6 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface MeetResponseData {
+  id: number;
+  title: string;
+  meet_hash: string;
+  start_time: string;
+  expires_at: string;
+  creator_id: number;
+}

@@ -6,6 +6,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface LoginResponseDTO {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  message: string;
+}

@@ -1,7 +1,6 @@
-import type { UserLogin } from "@/lib/generated/types/model";
 import { z } from "zod";
 
-export const loginSchema: z.ZodType<UserLogin> = z.object({
+export const loginSchema = z.object({
   username: z
     .string()
     .trim()

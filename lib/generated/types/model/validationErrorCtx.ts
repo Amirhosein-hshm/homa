@@ -6,6 +6,4 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export type ValidationErrorCtx = { [key: string]: unknown };

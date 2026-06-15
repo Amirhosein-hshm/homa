@@ -1,7 +1,7 @@
 "use client";
 
-import { signUpAction } from "@/lib/action/auth";
-import { useServerAction } from "@/lib/generated/hooks/useServerAction";
+import { useRegisterUserUsersRegisterPost } from "@/lib/generated/hooks";
+import { Role } from "@/lib/generated/types/model";
 import {
   type SignUpInput,
   signUpSchema,
@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function useSignUpForm() {
   const router = useRouter();
@@ -19,10 +20,12 @@ export function useSignUpForm() {
     signUpSchema as unknown as Parameters<typeof zodResolver>[0],
   ) as unknown as Resolver<SignUpInput>;
 
-  const { execute, isPending } = useServerAction(signUpAction, {
-    successMessage: "حساب کاربری با موفقیت ایجاد شد.",
-    onSuccess: (data) => {
-      router.replace(data.redirectTo);
+  const { mutateAsync, isPending } = useRegisterUserUsersRegisterPost({
+    mutation: {
+      onSuccess: () => {
+        toast.success("حساب کاربری با موفقیت ایجاد شد.");
+        router.replace("/login");
+      },
     },
   });
 
@@ -44,12 +47,15 @@ export function useSignUpForm() {
   });
 
   const onValidSubmit: SubmitHandler<SignUpInput> = (data) => {
-    execute({
-      first_name: data.first_name,
-      last_name: data.last_name,
-      username: data.username,
-      email: data.email,
-      password: data.password,
+    mutateAsync({
+      data: {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: Role.User,
+      },
     });
   };
 

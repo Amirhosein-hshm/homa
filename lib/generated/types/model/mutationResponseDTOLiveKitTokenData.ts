@@ -5,8 +5,10 @@
  * Clean Architecture implementation with FastAPI
  * OpenAPI spec version: 1.0.0
  */
-import type { ValidationError } from './validationError';
+import type { LiveKitTokenData } from './liveKitTokenData';
 
-export interface HTTPValidationError {
-  detail?: ValidationError[];
+export interface MutationResponseDTOLiveKitTokenData {
+  data: LiveKitTokenData;
+  message: string;
+  detail?: string | null;
 }

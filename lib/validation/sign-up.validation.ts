@@ -1,7 +1,11 @@
-import type { UserCreate } from "@/lib/generated/types/model";
 import { z } from "zod";
 
-export type SignUpInput = UserCreate & {
+export type SignUpInput = {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
   passwordConfirm: string;
 };
 

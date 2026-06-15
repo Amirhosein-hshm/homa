@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface MutationResponseDTO {
+  data: unknown;
+  message: string;
+  detail?: string | null;
+}

@@ -1,10 +1,7 @@
-import { getCurrentUserProfile } from "@/lib/api/current-user";
 import MainHeaderProfile from "@/components/layout/MainHeaderProfile";
 import Link from "next/link";
 
-export default async function MainHeader() {
-  const profile = await getCurrentUserProfile();
-
+export default function MainHeader() {
   return (
     <header
       className="h-16 w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 bg-gray-50 border-b border-b-gray-200 "
@@ -36,7 +33,7 @@ export default async function MainHeader() {
               </Link>
             </li>
             <li>
-              <MainHeaderProfile {...profile} />
+              <MainHeaderProfile />
             </li>
           </ul>
         </nav>

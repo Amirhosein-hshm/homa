@@ -1,7 +1,7 @@
-import type { MeetCreate } from "@/lib/generated/types/model";
+import type { CreateMeetRequestDTO } from "@/lib/generated/types/model";
 import { z } from "zod";
 
-export type CreateMeetInput = MeetCreate;
+export type CreateMeetInput = Pick<CreateMeetRequestDTO, "title">;
 
 export const createMeetSchema: z.ZodType<CreateMeetInput> = z.object({
   title: z

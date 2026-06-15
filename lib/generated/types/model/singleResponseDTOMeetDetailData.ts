@@ -5,7 +5,10 @@
  * Clean Architecture implementation with FastAPI
  * OpenAPI spec version: 1.0.0
  */
+import type { MeetDetailData } from './meetDetailData';
 
-export * from './getUserInvitationsUsersMeInvitationsGetParams';
-export * from './getUserManagedMeetsUsersMeManagedMeetsGetParams';
-export * from './listMeetsMeetsGetParams';
+export interface SingleResponseDTOMeetDetailData {
+  data: MeetDetailData;
+  permissions?: string[];
+  detail?: string | null;
+}

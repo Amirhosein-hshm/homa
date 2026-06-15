@@ -1,10 +1,9 @@
-import "dotenv/config";
 import { defineConfig } from "orval";
 
 export default defineConfig({
   api: {
     input: {
-      target: process.env.SWAGGER_URL!,
+      target: "http://127.0.0.1:8000/openapi.json",
     },
     output: {
       workspace: "./lib/generated",

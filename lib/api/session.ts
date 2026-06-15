@@ -1,11 +1,13 @@
-import type { Token } from "@/lib/generated/types/model";
-import { refreshTokensApiAuthRefreshPost } from "@/lib/generated/endpoints/auth";
+import {
+  refreshTokenUsersRefreshPost,
+  type RefreshTokenRequestDTO,
+} from "@/lib/generated";
 import { cookies } from "next/headers";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import "server-only";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
+const REFRESH_TOKEN_COOKIE = "refresh_token";
 const TOKEN_TYPE_COOKIE = "token_type";
 const ACCESS_TOKEN_EXPIRES_AT_COOKIE = "access_token_expires_at";
 const DEFAULT_EXPIRY_MS = 60 * 60 * 1000;
@@ -13,8 +15,13 @@ const isProduction = process.env.NODE_ENV === "production";
 const MIN_VALID_EXPIRY_BUFFER_MS = 1000;
 const REFRESH_BEFORE_EXPIRY_MS = 30 * 1000;
 
-export type SessionTokenInput = Pick<Token, "token"> &
-  Partial<Pick<Token, "type" | "expires_at" | "title">>;
+export type SessionTokenInput = {
+  token: string;
+  type?: string;
+  expires_at?: string;
+  title?: string;
+  refresh_token?: string;
+};
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
@@ -43,46 +50,45 @@ const parseAuthorizationHeader = (
 };
 
 export const extractSessionToken = (
-  payload: Token | null | undefined,
+  payload: Record<string, unknown> | null | undefined,
   authorizationHeader: string | null,
 ): SessionTokenInput | null => {
-  const rawPayload = payload as
-    | (Partial<Token> & {
-        access_token?: string;
-        token_type?: string;
-        exp?: number;
-      })
-    | null
-    | undefined;
-
-  const payloadToken = isNonEmptyString(rawPayload?.token)
-    ? rawPayload.token.trim()
-    : isNonEmptyString(rawPayload?.access_token)
-      ? rawPayload.access_token.trim()
-      : "";
-
-  if (payloadToken) {
-    const expiresAt = isNonEmptyString(rawPayload?.expires_at)
-      ? rawPayload.expires_at
-      : typeof rawPayload?.exp === "number"
-        ? new Date(rawPayload.exp * 1000).toISOString()
-        : undefined;
-
-    return {
-      token: payloadToken,
-      type: isNonEmptyString(rawPayload?.type)
-        ? rawPayload.type
-        : isNonEmptyString(rawPayload?.token_type)
-          ? rawPayload.token_type
-          : "Bearer",
-      title: isNonEmptyString(rawPayload?.title)
-        ? rawPayload.title
-        : "access-token",
-      expires_at: expiresAt,
-    };
+  if (!payload) {
+    return parseAuthorizationHeader(authorizationHeader);
   }
 
-  return parseAuthorizationHeader(authorizationHeader);
+  const payloadToken =
+    isNonEmptyString(payload.token)
+      ? (payload.token as string).trim()
+      : isNonEmptyString(payload.access_token)
+        ? (payload.access_token as string).trim()
+        : "";
+
+  if (!payloadToken) {
+    return parseAuthorizationHeader(authorizationHeader);
+  }
+
+  const expiresAt = isNonEmptyString(payload.expires_at)
+    ? (payload.expires_at as string)
+    : typeof payload.exp === "number"
+      ? new Date((payload.exp as number) * 1000).toISOString()
+      : undefined;
+
+  return {
+    token: payloadToken,
+    type: isNonEmptyString(payload.type)
+      ? (payload.type as string)
+      : isNonEmptyString(payload.token_type)
+        ? (payload.token_type as string)
+        : "Bearer",
+    title: isNonEmptyString(payload.title)
+      ? (payload.title as string)
+      : "access-token",
+    expires_at: expiresAt,
+    refresh_token: isNonEmptyString(payload.refresh_token)
+      ? (payload.refresh_token as string).trim()
+      : undefined,
+  };
 };
 
 const resolveExpiryDate = (expiresAt?: string) => {
@@ -167,13 +173,30 @@ export async function setSessionFromToken(
     path: "/",
     expires,
   });
+
+  const refreshToken = tokenPayload.refresh_token?.trim();
+  if (refreshToken) {
+    cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, {
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: "lax",
+      path: "/",
+      expires,
+    });
+  }
 }
 
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(ACCESS_TOKEN_COOKIE);
+  cookieStore.delete(REFRESH_TOKEN_COOKIE);
   cookieStore.delete(TOKEN_TYPE_COOKIE);
   cookieStore.delete(ACCESS_TOKEN_EXPIRES_AT_COOKIE);
+}
+
+export async function getRefreshToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(REFRESH_TOKEN_COOKIE)?.value ?? null;
 }
 
 export async function getSessionToken(): Promise<string | null> {
@@ -181,38 +204,30 @@ export async function getSessionToken(): Promise<string | null> {
   return cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? null;
 }
 
-type RefreshResponse = Awaited<ReturnType<typeof refreshTokensApiAuthRefreshPost>>;
-type RefreshSuccessResponse = Extract<RefreshResponse, { status: 200 }>;
-
-const isRefreshSuccessResponse = (
-  response: RefreshResponse,
-): response is RefreshSuccessResponse =>
-  response.status === 200 && response.data.success;
-
 export async function refreshSessionFromServer(
   options?: { persist?: boolean },
 ): Promise<SessionTokenInput | null> {
   try {
-    const incomingHeaders = await headers();
-    const forwardedHeaders: Record<string, string> = {};
-
-    const cookie = incomingHeaders.get("cookie");
-    if (cookie) {
-      forwardedHeaders.cookie = cookie;
-    }
-
-    const refreshResult = await refreshTokensApiAuthRefreshPost({
-      credentials: "include",
-      headers: forwardedHeaders,
-    });
-
-    if (!isRefreshSuccessResponse(refreshResult)) {
+    const refreshToken = await getRefreshToken();
+    if (!refreshToken) {
       return null;
     }
 
+    const body: RefreshTokenRequestDTO = { refresh_token: refreshToken };
+    const refreshResult = await refreshTokenUsersRefreshPost(body);
+
+    if (refreshResult.status !== 200) {
+      return null;
+    }
+
+    const data = refreshResult.data as Record<string, unknown>;
     const sessionToken = extractSessionToken(
-      refreshResult.data.payload,
-      refreshResult.headers.get("authorization"),
+      {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        token_type: data.token_type,
+      },
+      null,
     );
 
     if (!sessionToken) {

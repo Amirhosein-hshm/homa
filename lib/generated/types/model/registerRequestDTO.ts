@@ -5,8 +5,13 @@
  * Clean Architecture implementation with FastAPI
  * OpenAPI spec version: 1.0.0
  */
-import type { ValidationError } from './validationError';
+import type { Role } from './role';
 
-export interface HTTPValidationError {
-  detail?: ValidationError[];
+export interface RegisterRequestDTO {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
+  role: Role;
 }
