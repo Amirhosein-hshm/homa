@@ -7,13 +7,14 @@ const normalizeBaseUrl = (value: string) =>
     .replace(/\/+$/, "")
     .replace(/\/docs$/, "");
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
+const DEFAULT_API_BASE_URL_SERVER = "http://127.0.0.1:8000";
+const DEFAULT_API_BASE_URL_CLIENT = "/api/proxy";
 
 const resolveApiBaseUrl = () => {
   const rawBaseUrl =
     typeof window === "undefined"
-      ? (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL)
-      : (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL);
+      ? (process.env.API_BASE_URL ?? DEFAULT_API_BASE_URL_SERVER)
+      : (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL_CLIENT);
 
   return normalizeBaseUrl(rawBaseUrl);
 };
