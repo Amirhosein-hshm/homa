@@ -6,18 +6,18 @@ Smart Online Meeting Management Platform.
 
 ## Project Overview
 
-| Key | Value |
-|---|---|
-| **Name** | `home_web` — Homa (هما) |
-| **Version** | 0.1.0 |
-| **Stack** | Next.js 16.1 · React 19.2 · TypeScript 5 · Tailwind v4 |
-| **UI** | shadcn/ui (new-york style) · Radix UI · Lucide Icons |
-| **State** | TanStack Query v5 · TanStack Table v8 |
-| **HTTP** | Axios · Orval v8 (codegen from OpenAPI) |
-| **Forms** | React Hook Form v7 · Zod v4 |
-| **Auth** | JWT (jose) · httpOnly cookies · next-themes |
-| **Lang** | Persian (fa) · RTL · Vazir font |
-| **PM** | pnpm (with workspace) |
+| Key         | Value                                                  |
+| ----------- | ------------------------------------------------------ |
+| **Name**    | `home_web` — Homa (هما)                                |
+| **Version** | 0.1.0                                                  |
+| **Stack**   | Next.js 16.1 · React 19.2 · TypeScript 5 · Tailwind v4 |
+| **UI**      | shadcn/ui (new-york style) · Radix UI · Lucide Icons   |
+| **State**   | TanStack Query v5 · TanStack Table v8                  |
+| **HTTP**    | Axios · Orval v8 (codegen from OpenAPI)                |
+| **Forms**   | React Hook Form v7 · Zod v4                            |
+| **Auth**    | JWT (jose) · httpOnly cookies · next-themes            |
+| **Lang**    | Persian (fa) · RTL · Vazir font                        |
+| **PM**      | pnpm (with workspace)                                  |
 
 ---
 
@@ -205,12 +205,12 @@ pages/auth/
 
 ### Component Categories
 
-| Directory | Purpose |
-|---|---|
-| `components/ui/` | shadcn primitives + custom composite UI (SmartTable, SmartPagination, FormInputField, AppModal) |
-| `components/layout/` | App shell — headers, footers, profile dropdown |
-| `components/pages/` | Feature-specific — nested by domain (auth, meets, room) |
-| `components/icons/` | Custom inline SVG icon components |
+| Directory            | Purpose                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| `components/ui/`     | shadcn primitives + custom composite UI (SmartTable, SmartPagination, FormInputField, AppModal) |
+| `components/layout/` | App shell — headers, footers, profile dropdown                                                  |
+| `components/pages/`  | Feature-specific — nested by domain (auth, meets, room)                                         |
+| `components/icons/`  | Custom inline SVG icon components                                                               |
 
 ### API Layer
 
@@ -259,16 +259,16 @@ Cookie (access_token) ──► session.ts
 
 ### Naming Conventions
 
-| Entity | Convention | Example |
-|---|---|---|
-| Components | PascalCase | `LoginFormView.tsx` |
-| Hooks | `use*` camelCase | `useLoginForm.ts` |
-| Utils/helpers | camelCase | `cn()`, `formatDate()` |
-| Validation schemas | kebab-case | `create-meet.validation.ts` |
-| Pages | `page.tsx` | Always exactly `page.tsx` |
-| Layouts | `layout.tsx` | Always exactly `layout.tsx` |
-| Server Actions | camelCase | `loginAction`, `createMeetAction` |
-| API endpoint fns | camelCase | `getMeets()`, `createMeet()` |
+| Entity             | Convention       | Example                           |
+| ------------------ | ---------------- | --------------------------------- |
+| Components         | PascalCase       | `LoginFormView.tsx`               |
+| Hooks              | `use*` camelCase | `useLoginForm.ts`                 |
+| Utils/helpers      | camelCase        | `cn()`, `formatDate()`            |
+| Validation schemas | kebab-case       | `create-meet.validation.ts`       |
+| Pages              | `page.tsx`       | Always exactly `page.tsx`         |
+| Layouts            | `layout.tsx`     | Always exactly `layout.tsx`       |
+| Server Actions     | camelCase        | `loginAction`, `createMeetAction` |
+| API endpoint fns   | camelCase        | `getMeets()`, `createMeet()`      |
 
 ### Coding Guidelines
 
@@ -285,15 +285,37 @@ Cookie (access_token) ──► session.ts
 
 ---
 
+UI Patterns & Role-Based Access Control (RBAC)
+
+When implementing features that fetch collections of data (e.g., list views, paginated GET requests, or filtered tables), the following strict rules apply:
+
+    Table Presentation: Always use the shadcn/ui Table component (or the custom SmartTable wrapper) to render list data. Avoid using custom grids unless explicitly requested.
+
+    Pagination Integration: For endpoints returning standardized pagination metadata (i.e., total, current_page, pages, is_next, is_prev, size), you MUST implement the SmartPagination component. Map these specific response fields directly to the pagination controls.(use the shadcn/ui pagination)
+
+    **Dynamic Query Filters:** If a GET collection endpoint accepts search or filtering query parameters, you MUST render corresponding filter inputs (e.g., search fields, select dropdowns, toggles) directly above the table. These inputs must be synchronized with the URL state or component state, automatically triggering a TanStack Query refetch with the updated parameters whenever a user interacts with them
+
+    Action Menus (Three-Dot): Every data table must include an "Actions" column containing a shadcn DropdownMenu triggered by a three-dot (ellipsis) icon.
+
+    Strict RBAC for Actions: The options rendered inside the Action Menu depend strictly on the user's current role:
+
+        SuperAdmin, admin, or host: Must have full access -> Render [View, Edit, Delete].
+
+        user: Restricted access -> Render [View] only.
+
+    Role Source of Truth: The user's role MUST be read exclusively from the getMe query hook/state. Never infer the user's role from local storage, URL parameters, or other unrelated endpoints
+
+---
+
 ## Development Commands
 
-| Command | Purpose |
-|---|---|
-| `pnpm dev` | Start dev server (localhost:3000) |
-| `pnpm build` | Production build |
-| `pnpm start` | Start production server |
-| `pnpm lint` | ESLint (flat config) |
-| `pnpm orval` | Regenerate API client from OpenAPI |
+| Command           | Purpose                                 |
+| ----------------- | --------------------------------------- |
+| `pnpm dev`        | Start dev server (localhost:3000)       |
+| `pnpm build`      | Production build                        |
+| `pnpm start`      | Start production server                 |
+| `pnpm lint`       | ESLint (flat config)                    |
+| `pnpm orval`      | Regenerate API client from OpenAPI      |
 | `pnpm orval:sync` | Regenerate + run post-gen export script |
 
 ---
