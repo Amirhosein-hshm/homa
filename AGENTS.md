@@ -798,3 +798,31 @@ NEXT_PUBLIC_LIVEKIT_URL
 This template should be the default starting point for any meeting-related page.
 
 ---
+
+# Meeting Lobby & PreJoin Pattern
+
+To prevent the well-known "Element not part of the array: camera_placeholder" bug and ensure a smooth user experience, **every LiveKit room must implement a Lobby (PreJoin) step** before rendering the `<LiveKitRoom>` component.
+
+### Rules for Lobby Implementation:
+
+1.  **State Management**: Maintain a state (e.g., `preJoinChoices`) to hold the user's hardware selections (camera/mic).
+2.  **UI Layout**: Use a split-screen or card-based layout using `shadcn/ui`.
+    - Left/Top side: `<PreJoin>` component for camera preview and device selection.
+    - Right/Bottom side: Meeting details, title, and a list of currently active participants.
+3.  **Conditional Rendering**: The `<LiveKitRoom>` must NOT be mounted until the user successfully submits their `PreJoin` choices.
+4.  Pass `video={preJoinChoices.videoEnabled}` and `audio={preJoinChoices.audioEnabled}` to `<LiveKitRoom>`.
+
+---
+
+# Meeting Role-Based Access Control (RBAC) & Moderation
+
+Inside the meeting, capabilities differ drastically between the **Creator (Host)** and standard **Users**.
+
+### Rules for Meeting RBAC:
+
+1.  **Identify Roles**: Use the generated hook `useGetMeetByHashMeetsMeetHashGet` to fetch the meeting details. Compare `meetData.creator_id` with the current authenticated user's ID (fetched via `useGetCurrentUser` or similar session state).
+2.  **Boolean Flags**: Derive a clean boolean flag: `const isCreator = currentUser?.id === meetData?.creator_id`.
+3.  **UI Capabilities**:
+    - If `isCreator` is true, render moderation controls (Kick Participant, Mute Participant, Force Mute All) inside the participant list or custom control bar.
+    - If false, hide all administrative controls.
+4.  **LiveKit Permissions**: Ensure that UI-level moderation controls call the appropriate LiveKit SDK methods (e.g., `room.remoteParticipants.forEach(p => p.audioTrack?.setMuted(true))`) or trigger specific backend moderation endpoints.

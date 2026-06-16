@@ -1,57 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Loader2, AlertTriangle } from "lucide-react";
-
 import "@livekit/components-styles";
 
-import { LiveKitRoom, RoomAudioRenderer, VideoConference } from "@livekit/components-react";
-import { useGetMeetByHashMeetsMeetHashGet } from "@/lib/generated/hooks/meets";
-import { useGenerateTokenMeetsMeetHashTokenPost } from "@/lib/generated/hooks/live-kit";
+import { Loader2, AlertTriangle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { useRoomPage } from "@/components/pages/room/useRoomPage";
+import MeetingLobbyView from "@/components/pages/room/MeetingLobbyView";
+import MeetingRoom from "@/components/pages/room/MeetingRoom";
 
 export default function RoomPage() {
-  const params = useParams<{ roomId: string }>();
-  const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [tokenError, setTokenError] = useState(false);
-
-  const { data: meetData, isPending: meetLoading } = useGetMeetByHashMeetsMeetHashGet(params.roomId);
-  const tokenMutation = useGenerateTokenMeetsMeetHashTokenPost();
-
-  const meetReady = !!meetData && !meetLoading && meetData.status === 200;
-  const meetNotFound = !!meetData && !meetLoading && meetData.status !== 200;
-  const shouldFetchToken = meetReady && !token && !tokenError && !tokenMutation.isPending;
-
-  useEffect(() => {
-    if (!shouldFetchToken) return;
-
-    tokenMutation.mutate(
-      { meetHash: params.roomId },
-      {
-        onSuccess: (res) => {
-          const response = res as { data?: { data?: { token: string } } };
-          const t = response?.data?.data?.token;
-          if (t) {
-            setToken(t);
-          } else {
-            setTokenError(true);
-          }
-        },
-        onError: () => setTokenError(true),
-      },
-    );
-  }, [shouldFetchToken, params.roomId, tokenMutation]);
-
-  const handleDisconnected = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  const handleRetry = useCallback(() => {
-    setToken(null);
-    setTokenError(false);
-  }, []);
+  const {
+    meetDetail,
+    meetLoading,
+    meetNotFound,
+    currentUser,
+    isCreator,
+    token,
+    tokenError,
+    isFetchingToken,
+    preJoinChoices,
+    handleJoin,
+    handleRetry,
+    handleDisconnected,
+    handleBack,
+  } = useRoomPage();
 
   if (meetLoading) {
     return (
@@ -70,7 +43,7 @@ export default function RoomPage() {
         <div className="flex flex-col items-center gap-4">
           <AlertTriangle className="size-8 text-amber-500" />
           <p className="text-sm text-slate-600">جلسه مورد نظر یافت نشد.</p>
-          <Button variant="outline" onClick={() => router.back()}>
+          <Button variant="outline" onClick={handleBack}>
             بازگشت
           </Button>
         </div>
@@ -92,7 +65,17 @@ export default function RoomPage() {
     );
   }
 
-  if (!token) {
+  if (!preJoinChoices) {
+    return (
+      <MeetingLobbyView
+        meetDetail={meetDetail}
+        currentUser={currentUser}
+        onJoin={handleJoin}
+      />
+    );
+  }
+
+  if (isFetchingToken || !token) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
@@ -104,19 +87,11 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black" data-lk-theme="default">
-      <LiveKitRoom
-        token={token}
-        serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL ?? ""}
-        connect
-        video
-        audio
-        onDisconnected={handleDisconnected}
-        className="h-full w-full"
-      >
-        <VideoConference />
-        <RoomAudioRenderer />
-      </LiveKitRoom>
-    </div>
+    <MeetingRoom
+      token={token}
+      isCreator={isCreator}
+      preJoinChoices={preJoinChoices}
+      onDisconnected={handleDisconnected}
+    />
   );
 }
