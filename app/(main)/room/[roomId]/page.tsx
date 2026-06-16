@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, AlertTriangle } from "lucide-react";
 
+import "@livekit/components-styles";
+
 import { LiveKitRoom, RoomAudioRenderer, VideoConference } from "@livekit/components-react";
 import { useGetMeetByHashMeetsMeetHashGet } from "@/lib/generated/hooks/meets";
 import { useGenerateTokenMeetsMeetHashTokenPost } from "@/lib/generated/hooks/live-kit";
@@ -102,7 +104,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black" data-lk-theme="default">
       <LiveKitRoom
         token={token}
         serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL ?? ""}
