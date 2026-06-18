@@ -3,24 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormInputField } from "@/components/ui/FormInputField";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { LoaderIcon } from "lucide-react";
-import type { EditProfileFormController } from "./useEditProfileForm";
+import type { MyProfileFormController } from "./useMyProfileForm";
 
-export function EditProfileFormView({
+export function MyProfileFormView({
   form,
   isPending,
   profileLoading,
-  canEditRole,
-  canEditActive,
   onSubmit,
-}: EditProfileFormController) {
+}: MyProfileFormController) {
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -66,44 +57,6 @@ export function EditProfileFormView({
               placeholder="ایمیل خود را وارد کنید"
               type="email"
             />
-
-            {canEditRole && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium">نقش</label>
-                <Select
-                  value={form.watch("role") ?? "User"}
-                  onValueChange={(value) => form.setValue("role", value, { shouldValidate: true })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="انتخاب نقش" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="User">کاربر</SelectItem>
-                    <SelectItem value="Host">میزبان</SelectItem>
-                    <SelectItem value="Admin">مدیر</SelectItem>
-                    <SelectItem value="SuperAdmin">مدیر ارشد</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {canEditActive && (
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-medium cursor-pointer" htmlFor="is_active">
-                  وضعیت حساب
-                </label>
-                <input
-                  id="is_active"
-                  type="checkbox"
-                  checked={form.watch("is_active") ?? true}
-                  onChange={(e) => form.setValue("is_active", e.target.checked, { shouldValidate: true })}
-                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-sm text-slate-600">
-                  {form.watch("is_active") ? "فعال" : "غیرفعال"}
-                </span>
-              </div>
-            )}
 
             <div className="flex items-center gap-3 pt-2">
               <Button type="submit" disabled={isPending} className="gap-2">

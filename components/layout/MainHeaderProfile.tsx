@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLogoutUserUsersLogoutPost } from "@/lib/generated/hooks";
 import { useGetCurrentUserProfileUsersMeGet } from "@/lib/generated/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDownIcon, LogOutIcon, UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ const getCookie = (name: string): string | null => {
 
 export default function MainHeaderProfile() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data, isLoading } = useGetCurrentUserProfileUsersMeGet();
 
   const profile = (() => {
@@ -53,9 +55,10 @@ export default function MainHeaderProfile() {
     mutation: {
       onSuccess: async () => {
         await clearAuthSessionAction();
+        queryClient.clear();
         toast.success("خروج با موفقیت انجام شد.");
-        router.replace("/login");
         router.refresh();
+        router.replace("/login");
       },
     },
   });
@@ -67,8 +70,9 @@ export default function MainHeaderProfile() {
     } else {
       void (async () => {
         await clearAuthSessionAction();
-        router.replace("/login");
+        queryClient.clear();
         router.refresh();
+        router.replace("/login");
       })();
     }
   };
@@ -113,7 +117,7 @@ export default function MainHeaderProfile() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="justify-end cursor-pointer gap-2"
-          onClick={() => router.push(`/users/by-username/${profile.username}`)}
+          onClick={() => router.push(`/my-profile`)}
         >
           مشاهده نمایه
           <UserIcon className="size-4" />

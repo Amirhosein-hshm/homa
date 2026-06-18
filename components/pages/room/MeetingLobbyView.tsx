@@ -2,7 +2,7 @@
 
 import { PreJoin } from "@livekit/components-react";
 import type { LocalUserChoices } from "@livekit/components-react";
-import type { MeetDetailData, GetMeResponseDTO } from "@/lib/generated/types/model";
+import type { MeetDetailWithParticipantsData, GetMeResponseDTO } from "@/lib/generated/types/model";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const dateFormatter = new Intl.DateTimeFormat("fa-IR", {
@@ -11,7 +11,7 @@ const dateFormatter = new Intl.DateTimeFormat("fa-IR", {
 });
 
 interface MeetingLobbyViewProps {
-  meetDetail: MeetDetailData | null;
+  meetDetail: MeetDetailWithParticipantsData | null;
   currentUser: GetMeResponseDTO | null;
   onJoin: (choices: LocalUserChoices) => void;
 }
@@ -87,17 +87,17 @@ export default function MeetingLobbyView({ meetDetail, currentUser, onJoin }: Me
             <CardHeader>
               <CardTitle className="text-sm">شرکت‌کنندگان در جلسه</CardTitle>
               <CardDescription>
-                {meetDetail?.participant_ids.length ?? 0} نفر
+                {meetDetail?.participants.length ?? 0} نفر
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {meetDetail && meetDetail.participant_ids.length > 0 ? (
+              {meetDetail && meetDetail.participants.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {meetDetail.participant_ids.map((id) => {
-                    const isCurrentUser = currentUser?.id === id;
+                  {meetDetail.participants.map((p) => {
+                    const isCurrentUser = currentUser?.id === p.id;
                     return (
                       <div
-                        key={id}
+                        key={p.id}
                         className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${
                           isCurrentUser
                             ? "border-indigo-200 bg-indigo-50 text-indigo-700"
@@ -105,9 +105,9 @@ export default function MeetingLobbyView({ meetDetail, currentUser, onJoin }: Me
                         }`}
                       >
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-current text-[10px] text-white">
-                          {id.toString().slice(0, 2)}
+                          {p.first_name?.charAt(0) ?? p.id.toString().slice(0, 2)}
                         </span>
-                        {isCurrentUser ? "شما" : `کاربر ${id}`}
+                        {isCurrentUser ? "شما" : (p.first_name ?? `کاربر ${p.id}`)}
                       </div>
                     );
                   })}

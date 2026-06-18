@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import FormDatePickerField from "@/components/ui/FormDatePickerField";
 import { FormInputField } from "@/components/ui/FormInputField";
 import {
   Sheet,
@@ -62,19 +63,19 @@ export default function CreateEditMeetSheetView({
               placeholder="مثال: جلسه برنامه‌ریزی هفتگی"
               autoComplete="off"
             />
-            <FormInputField
-              id="start_time"
+            <FormDatePickerField
               name="start_time"
               control={control}
               label="زمان شروع"
-              type="datetime-local"
+              placeholder="تاریخ و زمان شروع جلسه"
+              enableTime
             />
-            <FormInputField
-              id="expires_at"
+            <FormDatePickerField
               name="expires_at"
               control={control}
               label="زمان انقضا"
-              type="datetime-local"
+              placeholder="تاریخ و زمان پایان جلسه"
+              enableTime
             />
             <FormInputField
               id="guest_usernames"

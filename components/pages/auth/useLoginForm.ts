@@ -5,6 +5,7 @@ import { useLoginUserUsersLoginPost } from "@/lib/generated/hooks";
 import type { LoginUserUsersLoginPostMutationResult } from "@/lib/generated/endpoints/users/users";
 import { type LoginInput, loginSchema } from "@/lib/validation/login.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 
 export function useLoginForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const loginResolver = zodResolver(
     loginSchema as unknown as Parameters<typeof zodResolver>[0],
@@ -38,6 +40,8 @@ export function useLoginForm() {
 
         if (result.success) {
           toast.success("ورود با موفقیت انجام شد.");
+          queryClient.clear();
+          router.refresh();
           router.replace("/meets");
         }
       },

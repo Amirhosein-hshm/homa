@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { LocalUserChoices } from "@livekit/components-react";
 
-import type { MeetDetailData } from "@/lib/generated/types/model";
+import type { MeetDetailWithParticipantsData } from "@/lib/generated/types/model";
 import { useGetMeetByHashMeetsMeetHashGet } from "@/lib/generated/hooks/meets";
 import { useGenerateTokenMeetsMeetHashTokenPost } from "@/lib/generated/hooks/live-kit";
 import { useGetCurrentUserProfileUsersMeGet } from "@/lib/generated/hooks/users";
@@ -22,9 +22,9 @@ export function useRoomPage() {
   const tokenMutation = useGenerateTokenMeetsMeetHashTokenPost();
 
   const currentUser = currentUserRaw?.data?.data ?? null;
-  const meetDetail: MeetDetailData | null =
+  const meetDetail: MeetDetailWithParticipantsData | null =
     meetData && meetData.status === 200
-      ? (meetData.data as { data: MeetDetailData }).data
+      ? (meetData.data as { data: MeetDetailWithParticipantsData }).data
       : null;
   const meetNotFound = !!meetData && !meetLoading && meetData.status !== 200;
 

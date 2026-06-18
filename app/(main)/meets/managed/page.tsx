@@ -1,6 +1,7 @@
 "use client";
 
 import MeetDataTable from "@/components/pages/meets/MeetDataTable";
+import MeetsFilterBar from "@/components/pages/meets/MeetsFilterBar";
 import { useGetCurrentUserProfileUsersMeGet, useGetUserManagedMeetsUsersMeManagedMeetsGet } from "@/lib/generated/hooks";
 import type { PaginatedResponseDTOMeetListItemData } from "@/lib/generated/types/model";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +23,10 @@ export default function ManagedMeetsPage() {
     {
       page: apiPage,
       size: MEETS_PAGE_SIZE,
+      title_query: searchParams.get("title_query") || undefined,
+      start_date: searchParams.get("start_date") || undefined,
+      end_date: searchParams.get("end_date") || undefined,
+      guest_username: searchParams.get("guest_username") || undefined,
     },
   );
 
@@ -40,6 +45,7 @@ export default function ManagedMeetsPage() {
         isPending={isPending}
         role={role}
         showCreateButton={true}
+        filterBar={<MeetsFilterBar />}
       />
     </div>
   );

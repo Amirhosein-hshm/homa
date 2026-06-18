@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useBanParticipantMeetsMeetHashBanUserIdPost } from "@/lib/generated/hooks/live-kit";
+import { axiosInstance } from "@/lib/api/client";
 
 interface ModerationDropdownProps {
   participant: RemoteParticipant;
@@ -24,7 +24,6 @@ interface ModerationDropdownProps {
 export default function ModerationDropdown({ participant }: ModerationDropdownProps) {
   const params = useParams<{ roomId: string }>();
   const room = useRoomContext();
-  const banMutation = useBanParticipantMeetsMeetHashBanUserIdPost();
 
   const handleMute = useCallback(() => {
     const publication = participant.getTrackPublication(Track.Source.Microphone);
@@ -36,26 +35,21 @@ export default function ModerationDropdown({ participant }: ModerationDropdownPr
     }
   }, [participant]);
 
-  const handleKick = useCallback(() => {
+  const handleKick = useCallback(async () => {
     const userId = parseInt(participant.identity, 10);
     if (isNaN(userId)) {
       toast.error("شناسه کاربر نامعتبر است");
       return;
     }
 
-    banMutation.mutate(
-      { meetHash: params.roomId, userId },
-      {
-        onSuccess: () => {
-          room.remoteParticipants.delete(participant.identity);
-          toast.success(`${participant.name || participant.identity} از جلسه حذف شد`);
-        },
-        onError: () => {
-          toast.error("خطا در حذف شرکت‌کننده");
-        },
-      },
-    );
-  }, [participant, params.roomId, banMutation, room]);
+    try {
+      await axiosInstance(`/meets/${params.roomId}/ban/${userId}`, { method: "POST" });
+      room.remoteParticipants.delete(participant.identity);
+      toast.success(`${participant.name || participant.identity} از جلسه حذف شد`);
+    } catch {
+      toast.error("خطا در حذف شرکت‌کننده");
+    }
+  }, [participant, params.roomId, room]);
 
   return (
     <DropdownMenu modal={false}>

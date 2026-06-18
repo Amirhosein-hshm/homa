@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { StandaloneDatePicker } from "@/components/ui/FormDatePickerField";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
@@ -12,6 +13,7 @@ export default function MeetsFilterBar() {
   const titleQuery = searchParams.get("title_query") ?? "";
   const startDate = searchParams.get("start_date") ?? "";
   const endDate = searchParams.get("end_date") ?? "";
+  const guestUsername = searchParams.get("guest_username") ?? "";
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -50,18 +52,20 @@ export default function MeetsFilterBar() {
         onChange={handleTitleChange}
         className="w-48 text-sm"
       />
-      <Input
-        type="date"
-        placeholder="از تاریخ"
-        defaultValue={startDate}
-        onChange={(e) => updateParam("start_date", e.target.value)}
-        className="w-40 text-sm"
+      <StandaloneDatePicker
+        value={startDate || null}
+        onChange={(val) => updateParam("start_date", val ?? "")}
+        label="از تاریخ"
+      />
+      <StandaloneDatePicker
+        value={endDate || null}
+        onChange={(val) => updateParam("end_date", val ?? "")}
+        label="تا تاریخ"
       />
       <Input
-        type="date"
-        placeholder="تا تاریخ"
-        defaultValue={endDate}
-        onChange={(e) => updateParam("end_date", e.target.value)}
+        placeholder="نام کاربری مهمان..."
+        defaultValue={guestUsername}
+        onChange={(e) => updateParam("guest_username", e.target.value)}
         className="w-40 text-sm"
       />
     </div>

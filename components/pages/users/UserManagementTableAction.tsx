@@ -43,7 +43,7 @@ export function UserManagementTableAction({
         <DropdownMenuContent align="start" className="text-right min-w-[10rem]">
           <DropdownMenuItem
             className="justify-end cursor-pointer gap-2"
-            onClick={() => router.push(`/users/by-username/${username}`)}
+            onClick={() => router.push(`/profile/${username}`)}
           >
             مشاهده نمایه
             <EyeIcon className="size-4" />
@@ -52,7 +52,7 @@ export function UserManagementTableAction({
           {isAdmin && (
             <DropdownMenuItem
               className="justify-end cursor-pointer gap-2"
-              onClick={() => router.push(`/users/${userId}/edit?username=${username}`)}
+              onClick={() => router.push(`/profile/${username}`)}
             >
               ویرایش
               <PencilIcon className="size-4" />

@@ -39,6 +39,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/meets/managed", request.url));
   }
 
+  if (pathname.startsWith("/meets/managed") && role === "User") {
+    return NextResponse.redirect(new URL("/meets/invitations", request.url));
+  }
+
   if (pathname.startsWith("/users") && !isAdmin) {
     return NextResponse.redirect(new URL("/meets/managed", request.url));
   }
