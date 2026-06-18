@@ -5,10 +5,10 @@
  * Clean Architecture implementation with FastAPI
  * OpenAPI spec version: 1.0.0
  */
-import type { MeetDetailData } from './meetDetailData';
+import type { GetMeResponseDTO } from './getMeResponseDTO';
 
-export interface SingleResponseDTOMeetDetailData {
-  data: MeetDetailData;
+export interface SingleResponseDTOGetMeResponseDTO {
+  data: GetMeResponseDTO;
   permissions?: string[];
   detail?: string | null;
 }

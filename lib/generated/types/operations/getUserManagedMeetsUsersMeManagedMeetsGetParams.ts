@@ -16,4 +16,8 @@ page?: number;
  * @maximum 100
  */
 size?: number;
+start_date?: string | null;
+end_date?: string | null;
+guest_username?: string | null;
+title_query?: string | null;
 };

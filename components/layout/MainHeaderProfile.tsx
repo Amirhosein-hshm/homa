@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLogoutUserUsersLogoutPost } from "@/lib/generated/hooks";
 import { useGetCurrentUserProfileUsersMeGet } from "@/lib/generated/hooks";
-import { ChevronDownIcon, LogOutIcon } from "lucide-react";
+import { ChevronDownIcon, LogOutIcon, UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -110,6 +110,14 @@ export default function MainHeaderProfile() {
             @{profile.username}
           </p>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="justify-end cursor-pointer gap-2"
+          onClick={() => router.push(`/users/by-username/${profile.username}`)}
+        >
+          مشاهده نمایه
+          <UserIcon className="size-4" />
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="justify-end cursor-pointer"

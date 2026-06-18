@@ -17,7 +17,6 @@ import type {
 
 import type {
   HTTPValidationError,
-  MutationResponseDTOBanParticipantResponseData,
   MutationResponseDTOLiveKitTokenData
 } from '../../types/model';
 
@@ -116,96 +115,5 @@ export const useGenerateTokenMeetsMeetHashTokenPost = <TError = HTTPValidationEr
         TContext
       > => {
       return useMutation(getGenerateTokenMeetsMeetHashTokenPostMutationOptions(options), queryClient);
-    }
-    /**
- * @summary Ban Participant
- */
-export type banParticipantMeetsMeetHashBanUserIdPostResponse200 = {
-  data: MutationResponseDTOBanParticipantResponseData
-  status: 200
-}
-
-export type banParticipantMeetsMeetHashBanUserIdPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type banParticipantMeetsMeetHashBanUserIdPostResponseSuccess = (banParticipantMeetsMeetHashBanUserIdPostResponse200) & {
-  headers: Headers;
-};
-export type banParticipantMeetsMeetHashBanUserIdPostResponseError = (banParticipantMeetsMeetHashBanUserIdPostResponse422) & {
-  headers: Headers;
-};
-
-export type banParticipantMeetsMeetHashBanUserIdPostResponse = (banParticipantMeetsMeetHashBanUserIdPostResponseSuccess | banParticipantMeetsMeetHashBanUserIdPostResponseError)
-
-export const getBanParticipantMeetsMeetHashBanUserIdPostUrl = (meetHash: string,
-    userId: number,) => {
-
-
-  
-
-  return `/meets/${meetHash}/ban/${userId}`
-}
-
-export const banParticipantMeetsMeetHashBanUserIdPost = async (meetHash: string,
-    userId: number, options?: RequestInit): Promise<banParticipantMeetsMeetHashBanUserIdPostResponse> => {
-  
-  return axiosInstance<banParticipantMeetsMeetHashBanUserIdPostResponse>(getBanParticipantMeetsMeetHashBanUserIdPostUrl(meetHash,userId),
-  {
-      type: 'axios',
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-
-
-
-
-export const getBanParticipantMeetsMeetHashBanUserIdPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>, TError,{meetHash: string;userId: number}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>, TError,{meetHash: string;userId: number}, TContext> => {
-
-const mutationKey = ['banParticipantMeetsMeetHashBanUserIdPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>, {meetHash: string;userId: number}> = (props) => {
-          const {meetHash,userId} = props ?? {};
-
-          return  banParticipantMeetsMeetHashBanUserIdPost(meetHash,userId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BanParticipantMeetsMeetHashBanUserIdPostMutationResult = NonNullable<Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>>
-    
-    export type BanParticipantMeetsMeetHashBanUserIdPostMutationError = HTTPValidationError
-
-    /**
- * @summary Ban Participant
- */
-export const useBanParticipantMeetsMeetHashBanUserIdPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>, TError,{meetHash: string;userId: number}, TContext>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof banParticipantMeetsMeetHashBanUserIdPost>>,
-        TError,
-        {meetHash: string;userId: number},
-        TContext
-      > => {
-      return useMutation(getBanParticipantMeetsMeetHashBanUserIdPostMutationOptions(options), queryClient);
     }
     

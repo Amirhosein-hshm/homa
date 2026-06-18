@@ -14,7 +14,7 @@ import {
 import DatePicker from "react-multi-date-picker";
 import { Input } from "./input";
 
-const HOLIDAYS_1404_SET = new Set(iranHolidays);
+const HOLIDAYS_1405_SET = new Set(iranHolidays);
 
 type JalaliDate = {
   year: number;
@@ -115,7 +115,7 @@ function FormDatePickerField<T extends FieldValues>({
                 mapDays={({ date }: { date: JalaliDate }) => {
                   const isFriday = date.weekDay.index === 6;
                   const key = jalaliKey(date);
-                  const isHoliday = HOLIDAYS_1404_SET.has(key);
+                  const isHoliday = HOLIDAYS_1405_SET.has(key);
                   if (isFriday || isHoliday) {
                     return { style: { color: "red", fontWeight: "bold" } };
                   }

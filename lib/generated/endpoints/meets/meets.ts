@@ -32,7 +32,7 @@ import type {
   MutationResponseDTOMeetDetailData,
   MutationResponseDTOMeetResponseData,
   PaginatedResponseDTOMeetListItemData,
-  SingleResponseDTOMeetDetailData,
+  SingleResponseDTOMeetDetailWithParticipantsData,
   UpdateMeetRequestDTO
 } from '../../types/model';
 
@@ -262,7 +262,7 @@ export function useListMeetsMeetsGet<TData = Awaited<ReturnType<typeof listMeets
  * @summary Get Meet By Hash
  */
 export type getMeetByHashMeetsMeetHashGetResponse200 = {
-  data: SingleResponseDTOMeetDetailData
+  data: SingleResponseDTOMeetDetailWithParticipantsData
   status: 200
 }
 

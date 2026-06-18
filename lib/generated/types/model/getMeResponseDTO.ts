@@ -13,6 +13,7 @@ export interface GetMeResponseDTO {
   username: string;
   email: string;
   role: string;
+  is_active?: boolean;
   created_at: string;
   update_at: string;
 }

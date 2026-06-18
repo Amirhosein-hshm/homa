@@ -6,8 +6,15 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface BanParticipantResponseData {
-  meet_hash: string;
-  user_id: number;
-  banned: boolean;
-}
+export type ListUsersUsersGetParams = {
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+size?: number;
+username?: string | null;
+};

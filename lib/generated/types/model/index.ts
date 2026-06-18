@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './banParticipantResponseData';
 export * from './bodyLoginUserUsersLoginPost';
 export * from './createMeetRequestDTO';
 export * from './getMeResponseDTO';
@@ -14,22 +13,25 @@ export * from './hTTPValidationError';
 export * from './liveKitTokenData';
 export * from './loginResponseDTO';
 export * from './meetDetailData';
+export * from './meetDetailWithParticipantsData';
 export * from './meetListItemData';
 export * from './meetResponseData';
 export * from './mutationResponseDTO';
-export * from './mutationResponseDTOBanParticipantResponseData';
 export * from './mutationResponseDTOGetMeResponseDTO';
 export * from './mutationResponseDTOLiveKitTokenData';
 export * from './mutationResponseDTOMeetDetailData';
 export * from './mutationResponseDTOMeetResponseData';
 export * from './mutationResponseDTORegisterResponseDTO';
+export * from './paginatedResponseDTOGetMeResponseDTO';
 export * from './paginatedResponseDTOMeetListItemData';
 export * from './refreshTokenRequestDTO';
 export * from './refreshTokenResponseDTO';
 export * from './registerRequestDTO';
 export * from './registerResponseDTO';
 export * from './role';
-export * from './singleResponseDTOMeetDetailData';
+export * from './singleResponseDTOGetMeResponseDTO';
+export * from './singleResponseDTOMeetDetailWithParticipantsData';
 export * from './updateMeetRequestDTO';
+export * from './updateUserRequestDTO';
 export * from './validationError';
 export * from './validationErrorCtx';export * from '../operations';

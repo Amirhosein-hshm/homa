@@ -2,7 +2,7 @@
 
 import { useGetCurrentUserProfileUsersMeGet } from "@/lib/generated/hooks";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, ListIcon, MailQuestionIcon } from "lucide-react";
+import { CalendarIcon, ListIcon, MailQuestionIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,6 +27,13 @@ const navItems = [
     icon: MailQuestionIcon,
     minRole: null,
     exceptRoles: null,
+  },
+  {
+    href: "/users",
+    label: "مدیریت کاربران",
+    icon: UsersIcon,
+    minRole: null,
+    exceptRoles: ["User", "Host"],
   },
 ];
 
