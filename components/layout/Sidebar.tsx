@@ -2,7 +2,12 @@
 
 import { useGetCurrentUserProfileUsersMeGet } from "@/lib/generated/hooks";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, ListIcon, MailQuestionIcon, UsersIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ListIcon,
+  MailQuestionIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -12,7 +17,7 @@ const navItems = [
     label: "همه جلسات",
     icon: ListIcon,
     minRole: null,
-    exceptRoles: ["User"],
+    exceptRoles: ["User", "Host"],
   },
   {
     href: "/meets/managed",
@@ -42,7 +47,8 @@ export default function Sidebar() {
   const { data } = useGetCurrentUserProfileUsersMeGet();
   const role: string =
     data && data.status === 200
-      ? (data as { data: { data: { role: string } } }).data?.data?.role ?? "User"
+      ? ((data as { data: { data: { role: string } } }).data?.data?.role ??
+        "User")
       : "User";
 
   const visibleItems = navItems.filter((item) => {
