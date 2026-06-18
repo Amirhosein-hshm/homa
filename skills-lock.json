@@ -13,6 +13,12 @@
       "skillPath": "skills/orval/SKILL.md",
       "computedHash": "5184979818957c9ed7293a6e8345f3a1b76060a8ae31ba4e15f24e3656fd8061"
     },
+    "responsive-design": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/ui-design/skills/responsive-design/SKILL.md",
+      "computedHash": "794cc7f1b2f79d398135d19ef3fe32c406dde926b9bdf86ee3fe7b939a0be906"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
