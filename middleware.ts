@@ -2,7 +2,7 @@ import { decodeJwt } from "jose";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/register"];
+const PUBLIC_ROUTES = ["/login", "/sign-up"];
 
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
@@ -51,7 +51,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next|static|favicon.ico|images|fonts).*)",
-  ],
+  matcher: ["/((?!api|_next|static|favicon.ico|images|fonts).*)"],
 };
