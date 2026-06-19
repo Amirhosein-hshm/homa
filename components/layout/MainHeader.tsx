@@ -1,4 +1,5 @@
 import MainHeaderProfile from "@/components/layout/MainHeaderProfile";
+import MobileSidebar from "@/components/layout/MobileSidebar";
 import Link from "next/link";
 
 export default function MainHeader() {
@@ -9,6 +10,7 @@ export default function MainHeader() {
     >
       <div className="flex items-center justify-between h-full">
         <div className="flex items-center gap-3">
+          <MobileSidebar />
           <div className="rounded-full bg-indigo-600 text-white w-10 h-10 flex items-center justify-center font-semibold">
             م
           </div>

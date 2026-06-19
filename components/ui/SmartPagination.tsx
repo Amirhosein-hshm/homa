@@ -59,10 +59,10 @@ export function SmartPagination({
 
   return (
     <Pagination
-      className=" py-3 flex justify-center border-t"
+      className="py-3 flex justify-center border-t max-w-full overflow-x-auto"
       aria-label="Table Pagination"
     >
-      <PaginationContent dir="ltr">
+      <PaginationContent dir="ltr" className="min-w-max">
         <PaginationItem>
           <button
             disabled={currentPage === 0}

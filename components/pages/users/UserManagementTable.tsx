@@ -74,11 +74,12 @@ export function UserManagementTable() {
           placeholder="جستجوی نام کاربری..."
           defaultValue={username ?? ""}
           onChange={handleSearch}
-          className="w-64 text-sm"
+          className="w-full sm:w-64 text-sm"
         />
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto border rounded-lg">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -162,6 +163,7 @@ export function UserManagementTable() {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       <div className="shrink-0">

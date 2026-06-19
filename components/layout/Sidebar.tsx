@@ -42,7 +42,11 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  className?: string;
+}
+
+export default function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const { data } = useGetCurrentUserProfileUsersMeGet();
   const role: string =
@@ -59,7 +63,7 @@ export default function Sidebar() {
   });
 
   return (
-    <aside className="w-56 shrink-0 border-l border-gray-200 bg-white h-full flex flex-col overflow-y-auto">
+    <aside className={cn("w-56 shrink-0 border-l border-gray-200 bg-white h-full flex flex-col overflow-y-auto", className)}>
       <nav className="flex flex-col gap-1 p-3">
         {visibleItems.map((item) => {
           const isActive = pathname.startsWith(item.href);

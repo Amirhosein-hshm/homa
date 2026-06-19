@@ -134,6 +134,7 @@ export default function MeetDataTable({
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -174,6 +175,7 @@ export default function MeetDataTable({
                 )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         <div className="shrink-0 border-t border-slate-100">

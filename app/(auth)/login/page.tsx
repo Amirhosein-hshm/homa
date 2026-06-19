@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function Login() {
   return (
-    <Card className="bg-white rounded-xl card-shadow p-6 w-[70%]  grid grid-cols-12 gap-6">
+    <Card className="bg-white rounded-xl card-shadow p-6 w-full max-w-5xl lg:w-[70%] grid grid-cols-12 gap-6">
       <LoginInfoPanel />
       <LoginForm />
     </Card>

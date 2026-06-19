@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   return (
-    <Card className="bg-white rounded-xl card-shadow p-6 w-[70%]  grid grid-cols-12 gap-6">
+    <Card className="bg-white rounded-xl card-shadow p-6 w-full max-w-5xl lg:w-[70%] grid grid-cols-12 gap-6">
       <SignUpPanelInfo />
       <SignUpForm />
     </Card>

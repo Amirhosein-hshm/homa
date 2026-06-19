@@ -106,7 +106,7 @@ export function SmartTable<TData>({
     : null;
 
   return (
-    <Card className="w-[96%] mx-auto border border-gray-300 rounded-sm py-0 gap-0 h-full min-h-0 overflow-hidden">
+      <Card className="w-full lg:w-[96%] mx-auto border border-gray-300 rounded-sm py-0 gap-0 h-full min-h-0 overflow-hidden">
       <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2">
         {title && (
           <h3 className="text-xs text-tint-blue-500 font-semibold my-1">

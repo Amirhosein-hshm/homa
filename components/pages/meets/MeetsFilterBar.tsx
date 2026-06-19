@@ -50,7 +50,7 @@ export default function MeetsFilterBar() {
         placeholder="جستجوی عنوان جلسه..."
         defaultValue={titleQuery}
         onChange={handleTitleChange}
-        className="w-48 text-sm"
+        className="w-full sm:w-48 text-sm"
       />
       <StandaloneDatePicker
         value={startDate || null}
@@ -66,7 +66,7 @@ export default function MeetsFilterBar() {
         placeholder="نام کاربری مهمان..."
         defaultValue={guestUsername}
         onChange={(e) => updateParam("guest_username", e.target.value)}
-        className="w-40 text-sm"
+        className="w-full sm:w-40 text-sm"
       />
     </div>
   );
