@@ -45,9 +45,8 @@ export default function ModerationDropdown({ participant }: ModerationDropdownPr
     try {
       await axiosInstance(`/meets/${params.roomId}/ban/${userId}`, { method: "POST" });
       room.remoteParticipants.delete(participant.identity);
-      toast.success(`${participant.name || participant.identity} از جلسه حذف شد`);
     } catch {
-      toast.error("خطا در حذف شرکت‌کننده");
+      // error toast handled by global Axios interceptor
     }
   }, [participant, params.roomId, room]);
 

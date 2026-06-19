@@ -16,8 +16,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDownIcon, LogOutIcon, UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-
 const getCookie = (name: string): string | null => {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
@@ -56,7 +54,6 @@ export default function MainHeaderProfile() {
       onSuccess: async () => {
         await clearAuthSessionAction();
         queryClient.clear();
-        toast.success("خروج با موفقیت انجام شد.");
         router.refresh();
         router.replace("/login");
       },

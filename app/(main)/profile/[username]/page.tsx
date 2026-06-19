@@ -24,7 +24,6 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 const roleLabels: Record<string, string> = {
   SuperAdmin: "مدیر ارشد",
@@ -89,7 +88,6 @@ export default function UserProfilePage() {
     mutation: {
       onSuccess: (response) => {
         if (response.status === 200) {
-          toast.success("پروفایل با موفقیت به‌روزرسانی شد.");
           queryClient.invalidateQueries({ queryKey: getGetCurrentUserProfileUsersMeGetQueryKey() });
           queryClient.invalidateQueries({ queryKey: getListUsersUsersGetQueryKey() });
           setEditing(false);

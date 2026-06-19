@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useDeleteMeetMeetsMeetHashDelete } from "@/lib/generated/hooks/meets";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import type { MeetListItemData } from "@/lib/generated/types/model";
 
 type DeleteMeetDialogProps = {
@@ -29,11 +28,7 @@ export default function DeleteMeetDialog({ meet, open, onOpenChange }: DeleteMee
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["/meets"] });
         queryClient.invalidateQueries({ queryKey: ["/users/me"] });
-        toast.success("جلسه با موفقیت حذف شد.");
         onOpenChange(false);
-      },
-      onError: () => {
-        toast.error("خطا در حذف جلسه.");
       },
     },
   });

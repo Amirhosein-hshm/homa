@@ -814,6 +814,39 @@ To prevent the well-known "Element not part of the array: camera_placeholder" bu
 
 ---
 
+---
+
+# Global API Error & Success Handling (Axios Interceptors)
+
+All API error and success toasts are centralized in `lib/api/client.ts` via Axios response interceptors.
+
+## Error Interceptor
+
+- Catches **every** 4xx/5xx response (except 401 which is handled by token refresh).
+- Dynamically reads the backend error payload: `error.response.data.detail` (string or validation array) → `error.response.data.message` → `getStatusMessage(status)` → `DEFAULT_ERROR_MESSAGE`.
+- Calls `toast.error()` with the exact Persian message from the backend.
+
+## Success Interceptor (Mutations only)
+
+- Fires on **2xx** responses for methods `POST`, `PUT`, `PATCH`, `DELETE`.
+- Does **NOT** fire for `GET` requests.
+- Reads `response.data?.message` → `getStatusMessage(status)` (e.g., 200 → "عملیات با موفقیت انجام شد.", 201 → "با موفقیت ایجاد شد.", 204 → "با موفقیت حذف شد.") → `SUCCESS_MESSAGE_DEFAULT`.
+- Calls `toast.success()` with the resolved message.
+
+## Rules
+
+- **NEVER** add `toast.success()` or `toast.error()` calls inside mutation `onSuccess`/`onError` handlers in components. The global interceptors already handle these.
+- **NEVER** wrap Orval-generated mutation calls in `try/catch` for toast purposes — the interceptors handle errors.
+- **DO NOT** add `onError` callbacks to Orval mutation options — they are redundant.
+- **DO** keep non-toast logic in `onSuccess` handlers: query invalidation, state changes, navigation, etc.
+- **DO** keep `toast` calls for non-HTTP operations: clipboard, LiveKit events, browser APIs, etc.
+
+## Exception: Raw `axiosInstance()` Calls
+
+If you use `axiosInstance()` directly (outside Orval hooks), the interceptors still fire. You may still need a `try/catch` for control flow, but do **NOT** add a toast inside the `catch` block — the interceptor already shows one.
+
+---
+
 # Meeting Role-Based Access Control (RBAC) & Moderation
 
 Inside the meeting, capabilities differ drastically between the **Creator (Host)** and standard **Users**.

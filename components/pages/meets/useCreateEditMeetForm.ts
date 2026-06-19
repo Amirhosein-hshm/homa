@@ -10,8 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 type UseCreateEditMeetFormProps = {
   editMeetHash: string | null;
   detailData: { title: string; start_time: string; expires_at: string } | null;
@@ -69,11 +67,7 @@ export function useCreateEditMeetForm({
     mutation: {
       onSuccess: () => {
         invalidateMeets();
-        toast.success("جلسه با موفقیت ایجاد شد.");
         onSuccess();
-      },
-      onError: () => {
-        toast.error("خطا در ایجاد جلسه.");
       },
     },
   });
@@ -82,11 +76,7 @@ export function useCreateEditMeetForm({
     mutation: {
       onSuccess: () => {
         invalidateMeets();
-        toast.success("جلسه با موفقیت ویرایش شد.");
         onSuccess();
-      },
-      onError: () => {
-        toast.error("خطا در ویرایش جلسه.");
       },
     },
   });

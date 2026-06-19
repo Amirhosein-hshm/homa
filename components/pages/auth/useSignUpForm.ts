@@ -10,8 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 export function useSignUpForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +21,6 @@ export function useSignUpForm() {
   const { mutateAsync, isPending } = useRegisterUserUsersRegisterPost({
     mutation: {
       onSuccess: () => {
-        toast.success("حساب کاربری با موفقیت ایجاد شد.");
         router.replace("/login");
       },
     },

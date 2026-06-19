@@ -11,8 +11,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 export function useMyProfileForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -52,7 +50,6 @@ export function useMyProfileForm() {
     mutation: {
       onSuccess: (response) => {
         if (response.status === 200) {
-          toast.success("پروفایل با موفقیت به‌روزرسانی شد.");
           queryClient.invalidateQueries({ queryKey: getGetCurrentUserProfileUsersMeGetQueryKey() });
           router.push(`/profile/${form.getValues("username")}`);
         }

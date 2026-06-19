@@ -13,7 +13,6 @@ import {
 import { useDeleteUserUsersUserIdDelete } from "@/lib/generated/hooks";
 import { getListUsersUsersGetQueryKey } from "@/lib/generated/endpoints/users/users";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 type DeleteUserDialogProps = {
   open: boolean;
@@ -34,7 +33,6 @@ export function DeleteUserDialog({
     mutation: {
       onSuccess: (response) => {
         if (response.status === 200) {
-          toast.success(`کاربر ${username} با موفقیت حذف شد.`);
           queryClient.invalidateQueries({
             queryKey: getListUsersUsersGetQueryKey(),
           });

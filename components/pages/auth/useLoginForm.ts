@@ -9,8 +9,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, type SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-
 export function useLoginForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -39,7 +37,6 @@ export function useLoginForm() {
         });
 
         if (result.success) {
-          toast.success("ورود با موفقیت انجام شد.");
           queryClient.clear();
           router.refresh();
           router.replace("/meets");

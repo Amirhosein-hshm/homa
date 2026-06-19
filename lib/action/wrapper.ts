@@ -1,5 +1,26 @@
 import { isAxiosError } from "axios";
-import { DEFAULT_ERROR_MESSAGE, getStatusMessage } from "../constants/message";
+
+const DEFAULT_ERROR_MESSAGE = "خطای غیرمنتظره‌ای رخ داد.";
+
+const getStatusMessage = (status?: number): string | undefined => {
+  if (typeof status !== "number") return undefined;
+  if (status === 200) return "عملیات با موفقیت انجام شد.";
+  if (status === 201) return "با موفقیت ایجاد شد.";
+  if (status === 204) return "با موفقیت حذف شد.";
+  if (status >= 200 && status < 300) return "عملیات با موفقیت انجام شد.";
+  if (status === 400) return "درخواست نامعتبر است.";
+  if (status === 401) return "ابتدا وارد حساب کاربری شوید.";
+  if (status === 403) return "دسترسی غیرمجاز.";
+  if (status === 404) return "یافت نشد.";
+  if (status === 409) return "تداخل در اطلاعات.";
+  if (status === 422) return "خطای اعتبارسنجی مقادیر.";
+  if (status === 429) return "تعداد درخواست‌ها بیش از حد مجاز است.";
+  if (status === 500) return "خطای سرور. کمی بعد تلاش کنید.";
+  if (status === 503) return "سرویس موقتاً در دسترس نیست.";
+  if (status >= 400 && status < 500) return "درخواست قابل پردازش نیست.";
+  if (status >= 500 && status < 600) return "خطای سرور. کمی بعد تلاش کنید.";
+  return undefined;
+};
 
 export type ActionResult<T> = {
   data?: T;
