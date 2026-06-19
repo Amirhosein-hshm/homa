@@ -135,16 +135,25 @@ export function AsyncUserSelect({
               : placeholder || "انتخاب کاربران..."}
             <div className="flex items-center gap-1">
               {singleValue || multipleValues.length > 0 ? (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     handleClear();
                   }}
-                  className="size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleClear();
+                    }
+                  }}
+                  className="size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center cursor-pointer"
                 >
                   <X className="size-3" />
-                </button>
+                </span>
               ) : null}
               <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
             </div>

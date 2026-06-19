@@ -146,16 +146,25 @@ function DatePickerWidget({
             className={cn(error && "border-destructive", "w-full")}
           />
           {val && (
-            <button
-              type="button"
+            <span
+              role="button"
+              tabIndex={0}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 onChange(null);
               }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-400 hover:text-slate-600"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onChange(null);
+                }
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
             >
               <X className="size-3" />
-            </button>
+            </span>
           )}
         </div>
       )}
