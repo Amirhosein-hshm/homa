@@ -45,7 +45,7 @@ export function useCreateEditMeetForm({
       title: "",
       start_time: "",
       expires_at: "",
-      guest_usernames: "",
+      guest_usernames: [],
     },
   });
 
@@ -55,7 +55,7 @@ export function useCreateEditMeetForm({
         title: detailData.title,
         start_time: detailData.start_time.slice(0, 16),
         expires_at: detailData.expires_at.slice(0, 16),
-        guest_usernames: "",
+        guest_usernames: [],
       });
     }
   }, [detailData, reset]);
@@ -127,7 +127,7 @@ export function useCreateEditMeetForm({
         title: "",
         start_time: "",
         expires_at: "",
-        guest_usernames: "",
+        guest_usernames: [],
       }),
   };
 }

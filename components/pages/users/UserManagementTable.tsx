@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { Filter } from "lucide-react";
+
 import { SmartPagination } from "@/components/ui/SmartPagination";
 import {
   Table,
@@ -9,12 +12,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { AsyncUserSelect } from "@/components/ui/AsyncUserSelect";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useListUsersUsersGet } from "@/lib/generated/hooks";
 import type { ListUsersUsersGetParams } from "@/lib/generated/types/operations";
 import type { PaginatedResponseDTOGetMeResponseDTO } from "@/lib/generated/types/model";
-import { Input } from "@/components/ui/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useEffect } from "react";
 import { UserManagementTableAction } from "./UserManagementTableAction";
 
 const PAGE_SIZE = 20;
@@ -23,6 +33,9 @@ export function UserManagementTable() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const [open, setOpen] = useState(false);
+  const [filterUsername, setFilterUsername] = useState(searchParams.get("username") ?? "");
 
   const uiPage = Math.max(Number(searchParams.get("page") ?? 0), 0);
   const apiPage = uiPage + 1;
@@ -44,39 +57,70 @@ export function UserManagementTable() {
   const users = paginated?.data ?? [];
   const total = paginated?.total ?? 0;
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasActiveFilters = !!searchParams.get("username");
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (e.target.value) {
-        params.set("username", e.target.value);
-      } else {
-        params.delete("username");
-      }
-      params.delete("page");
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }, 300);
+  const handleOpen = () => {
+    setFilterUsername(searchParams.get("username") ?? "");
+    setOpen(true);
   };
 
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
+  const handleApply = () => {
+    const params = new URLSearchParams();
+    if (filterUsername) params.set("username", filterUsername);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    setOpen(false);
+  };
+
+  const handleClearAll = () => {
+    setFilterUsername("");
+  };
 
   return (
     <div className="flex flex-col h-full gap-2">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-slate-700">مدیریت کاربران</h2>
-        <Input
-          placeholder="جستجوی نام کاربری..."
-          defaultValue={username ?? ""}
-          onChange={handleSearch}
-          className="w-full sm:w-64 text-sm"
-        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleOpen}
+          className="gap-2"
+        >
+          <Filter className="size-4" />
+          فیلترها
+          {hasActiveFilters && (
+            <span className="size-2 rounded-full bg-indigo-600" />
+          )}
+        </Button>
       </div>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>فیلتر کاربران</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">نام کاربری</label>
+              <AsyncUserSelect
+                mode="single"
+                value={filterUsername}
+                onChange={(val) => setFilterUsername(val as string)}
+                placeholder="جستجوی کاربر..."
+              />
+            </div>
+          </div>
+
+          <SheetFooter className="flex-row gap-2">
+            <Button variant="outline" onClick={handleClearAll}>
+              پاک کردن همه
+            </Button>
+            <Button onClick={handleApply}>
+              اعمال فیلترها
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <div className="flex-1 min-h-0 overflow-y-auto border rounded-lg">
         <div className="overflow-x-auto">

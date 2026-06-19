@@ -1,73 +1,119 @@
 "use client";
 
+import { useCallback, useState } from "react";
+import { Filter } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StandaloneDatePicker } from "@/components/ui/FormDatePickerField";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef } from "react";
+import { AsyncUserSelect } from "@/components/ui/AsyncUserSelect";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export default function MeetsFilterBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const titleQuery = searchParams.get("title_query") ?? "";
-  const startDate = searchParams.get("start_date") ?? "";
-  const endDate = searchParams.get("end_date") ?? "";
-  const guestUsername = searchParams.get("guest_username") ?? "";
+  const [open, setOpen] = useState(false);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [titleQuery, setTitleQuery] = useState(searchParams.get("title_query") ?? "");
+  const [startDate, setStartDate] = useState(searchParams.get("start_date") ?? "");
+  const [endDate, setEndDate] = useState(searchParams.get("end_date") ?? "");
+  const [guestUsername, setGuestUsername] = useState(searchParams.get("guest_username") ?? "");
 
-  const updateParam = useCallback(
-    (key: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-      params.delete("page");
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    },
-    [searchParams, pathname, router],
-  );
+  const hasActiveFilters = !!(searchParams.get("title_query") || searchParams.get("start_date") || searchParams.get("end_date") || searchParams.get("guest_username"));
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      updateParam("title_query", e.target.value);
-    }, 300);
+  const handleOpen = () => {
+    setTitleQuery(searchParams.get("title_query") ?? "");
+    setStartDate(searchParams.get("start_date") ?? "");
+    setEndDate(searchParams.get("end_date") ?? "");
+    setGuestUsername(searchParams.get("guest_username") ?? "");
+    setOpen(true);
   };
 
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+  const handleApply = useCallback(() => {
+    const params = new URLSearchParams();
+    if (titleQuery) params.set("title_query", titleQuery);
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    if (guestUsername) params.set("guest_username", guestUsername);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    setOpen(false);
+  }, [titleQuery, startDate, endDate, guestUsername, pathname, router]);
+
+  const handleClearAll = useCallback(() => {
+    setTitleQuery("");
+    setStartDate("");
+    setEndDate("");
+    setGuestUsername("");
   }, []);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <Input
-        placeholder="جستجوی عنوان جلسه..."
-        defaultValue={titleQuery}
-        onChange={handleTitleChange}
-        className="w-full sm:w-48 text-sm"
-      />
-      <StandaloneDatePicker
-        value={startDate || null}
-        onChange={(val) => updateParam("start_date", val ?? "")}
-        label="از تاریخ"
-      />
-      <StandaloneDatePicker
-        value={endDate || null}
-        onChange={(val) => updateParam("end_date", val ?? "")}
-        label="تا تاریخ"
-      />
-      <Input
-        placeholder="نام کاربری مهمان..."
-        defaultValue={guestUsername}
-        onChange={(e) => updateParam("guest_username", e.target.value)}
-        className="w-full sm:w-40 text-sm"
-      />
-    </div>
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleOpen}
+        className="gap-2"
+      >
+        <Filter className="size-4" />
+        فیلترها
+        {hasActiveFilters && (
+          <span className="size-2 rounded-full bg-indigo-600" />
+        )}
+      </Button>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>فیلترهای جستجو</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <Input
+              placeholder="جستجوی عنوان جلسه..."
+              value={titleQuery}
+              onChange={(e) => setTitleQuery(e.target.value)}
+              className="text-sm"
+            />
+            <StandaloneDatePicker
+              value={startDate || null}
+              onChange={(val) => setStartDate(val ?? "")}
+              label="از تاریخ"
+            />
+            <StandaloneDatePicker
+              value={endDate || null}
+              onChange={(val) => setEndDate(val ?? "")}
+              label="تا تاریخ"
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">مهمان</label>
+              <AsyncUserSelect
+                mode="single"
+                value={guestUsername}
+                onChange={(val) => setGuestUsername(val as string)}
+                placeholder="انتخاب مهمان..."
+              />
+            </div>
+          </div>
+
+          <SheetFooter className="flex-row gap-2">
+            <Button variant="outline" onClick={handleClearAll}>
+              پاک کردن همه
+            </Button>
+            <Button onClick={handleApply}>
+              اعمال فیلترها
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import { Input } from "./input";
 import { Label } from "./label";
 
@@ -31,6 +32,7 @@ interface Props<
   rules?: RegisterOptions<T, Path<T>>;
   type?: HTMLInputElement["type"];
   nuSeparator?: boolean;
+  clearable?: boolean;
   "data-cy"?: string;
 }
 
@@ -42,6 +44,7 @@ function FormInputField<T extends FieldValues>({
   rules,
   type = "text",
   nuSeparator = false,
+  clearable = false,
   id,
   ...props
 }: Props<T>) {
@@ -75,32 +78,44 @@ function FormInputField<T extends FieldValues>({
 
           return (
             <>
-              <Input
-                {...props}
-                {...field}
-                id={inputId}
-                type={type}
-                data-cy={props["data-cy"]}
-                inputMode={type === "number" ? "numeric" : undefined}
-                value={displayValue}
-                aria-invalid={hasError}
-                aria-describedby={hasError ? errorId : undefined}
-                onChange={(e) => {
-                  if (type !== "number" || !nuSeparator) {
-                    field.onChange(e.target.value);
-                    return;
-                  }
+              <div className="relative">
+                <Input
+                  {...props}
+                  {...field}
+                  id={inputId}
+                  type={type}
+                  data-cy={props["data-cy"]}
+                  inputMode={type === "number" ? "numeric" : undefined}
+                  value={displayValue}
+                  aria-invalid={hasError}
+                  aria-describedby={hasError ? errorId : undefined}
+                  onChange={(e) => {
+                    if (type !== "number" || !nuSeparator) {
+                      field.onChange(e.target.value);
+                      return;
+                    }
 
-                  const raw = normalizeNumber(e.target.value).replace(/,/g, "");
-                  const num = Number(raw);
-                  field.onChange(!isNaN(num) ? num : undefined);
-                }}
-                className={cn(
-                  "w-full px-3 py-2 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100",
-                  hasError && "border-destructive focus:ring-destructive/20",
-                  className,
+                    const raw = normalizeNumber(e.target.value).replace(/,/g, "");
+                    const num = Number(raw);
+                    field.onChange(!isNaN(num) ? num : undefined);
+                  }}
+                  className={cn(
+                    "w-full px-3 py-2 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100",
+                    hasError && "border-destructive focus:ring-destructive/20",
+                    className,
+                    clearable && displayValue && "pl-8",
+                  )}
+                />
+                {clearable && displayValue && (
+                  <button
+                    type="button"
+                    onClick={() => field.onChange(type === "number" ? null : "")}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="size-3" />
+                  </button>
                 )}
-              />
+              </div>
 
               {hasError && (
                 <p

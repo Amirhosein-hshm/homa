@@ -1,6 +1,9 @@
 "use client";
 
+import { Controller } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
+import { AsyncUserSelect } from "@/components/ui/AsyncUserSelect";
 import FormDatePickerField from "@/components/ui/FormDatePickerField";
 import { FormInputField } from "@/components/ui/FormInputField";
 import {
@@ -77,13 +80,20 @@ export default function CreateEditMeetSheetView({
               placeholder="تاریخ و زمان پایان جلسه"
               enableTime
             />
-            <FormInputField
-              id="guest_usernames"
+            <Controller
               name="guest_usernames"
               control={control}
-              label="نام کاربری مهمانان"
-              placeholder="username1, username2, username3"
-              autoComplete="off"
+              render={({ field }) => (
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium">مهمانان</label>
+                  <AsyncUserSelect
+                    mode="multiple"
+                    value={field.value ?? []}
+                    onChange={(val) => field.onChange(val)}
+                    placeholder="انتخاب مهمانان..."
+                  />
+                </div>
+              )}
             />
           </form>
         )}

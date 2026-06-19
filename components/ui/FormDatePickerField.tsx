@@ -2,6 +2,7 @@
 
 import { iranHolidays } from "@/lib/constants/iran-holidays";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import {
@@ -132,17 +133,31 @@ function DatePickerWidget({
         }
       }}
       render={(val: string, openCalendar: () => void) => (
-        <Input
-          value={val}
-          onFocus={() => {
-            openCalendar();
-            onFocus?.();
-          }}
-          readOnly
-          id={name}
-          placeholder={placeholder}
-          className={cn(error && "border-destructive", "w-full")}
-        />
+        <div className="relative">
+          <Input
+            value={val}
+            onFocus={() => {
+              openCalendar();
+              onFocus?.();
+            }}
+            readOnly
+            id={name}
+            placeholder={placeholder}
+            className={cn(error && "border-destructive", "w-full")}
+          />
+          {val && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(null);
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 size-4 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-400 hover:text-slate-600"
+            >
+              <X className="size-3" />
+            </button>
+          )}
+        </div>
       )}
     />
   );
