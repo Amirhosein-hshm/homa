@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Sidebar from "./Sidebar";
@@ -24,6 +25,7 @@ export default function MobileSidebar() {
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-64 p-0">
+        <SheetTitle className="sr-only">منوی ناوبری</SheetTitle>
         <Sidebar />
       </SheetContent>
     </Sheet>

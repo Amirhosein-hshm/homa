@@ -4,29 +4,6 @@ import axios, {
   isAxiosError,
 } from "axios";
 
-const DEFAULT_ERROR_MESSAGE = "خطای غیرمنتظره‌ای رخ داد.";
-const SUCCESS_MESSAGE_DEFAULT = "عملیات با موفقیت انجام شد.";
-
-const getStatusMessage = (status?: number): string | undefined => {
-  if (typeof status !== "number") return undefined;
-  if (status === 200) return "عملیات با موفقیت انجام شد.";
-  if (status === 201) return "با موفقیت ایجاد شد.";
-  if (status === 204) return "با موفقیت حذف شد.";
-  if (status >= 200 && status < 300) return SUCCESS_MESSAGE_DEFAULT;
-  if (status === 400) return "درخواست نامعتبر است.";
-  if (status === 401) return "ابتدا وارد حساب کاربری شوید.";
-  if (status === 403) return "دسترسی غیرمجاز.";
-  if (status === 404) return "یافت نشد.";
-  if (status === 409) return "تداخل در اطلاعات.";
-  if (status === 422) return "خطای اعتبارسنجی مقادیر.";
-  if (status === 429) return "تعداد درخواست‌ها بیش از حد مجاز است.";
-  if (status === 500) return "خطای سرور. کمی بعد تلاش کنید.";
-  if (status === 503) return "سرویس موقتاً در دسترس نیست.";
-  if (status >= 400 && status < 500) return "درخواست قابل پردازش نیست.";
-  if (status >= 500 && status < 600) return "خطای سرور. کمی بعد تلاش کنید.";
-  return undefined;
-};
-
 const normalizeBaseUrl = (value: string) =>
   value
     .trim()
@@ -52,127 +29,102 @@ const instance = axios.create({
   },
 });
 
-const TOAST_INTERCEPTOR_KEY = "__home_web_axios_toast_interceptor__";
-const SUCCESS_INTERCEPTOR_KEY = "__home_web_axios_success_interceptor__";
-type AxiosToastWindow = Window & {
-  __home_web_axios_toast_interceptor__?: boolean;
-  __home_web_axios_success_interceptor__?: boolean;
-};
-
 const showClientErrorToast = (message: string) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
+  if (typeof window === "undefined") return;
   void import("sonner").then(({ toast }) => {
     toast.error(message);
   });
 };
 
 const showClientSuccessToast = (message: string) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
+  if (typeof window === "undefined") return;
   void import("sonner").then(({ toast }) => {
     toast.success(message);
   });
 };
 
-type ValidationErrorItem = {
-  loc: (string | number)[];
-  msg: string;
-  type: string;
-};
-
-const extractErrorMessage = (error: unknown): string => {
+const extractError = (error: unknown): string => {
   if (!isAxiosError(error) || !error.response?.data) {
-    return DEFAULT_ERROR_MESSAGE;
+    return "خطای غیرمنتظره‌ای رخ داد.";
   }
 
   const data = error.response.data as Record<string, unknown>;
-  const status = error.response.status;
   const detail = data.detail;
 
-  if (detail) {
-    if (Array.isArray(detail)) {
-      const messages = (detail as ValidationErrorItem[])
-        .map((e) => e.msg)
-        .filter(Boolean);
-      if (messages.length > 0) {
-        return messages.join(" • ");
-      }
-    }
-
-    if (typeof detail === "string" && detail.length > 0) {
-      return detail;
-    }
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((e: Record<string, unknown>) => e.msg)
+      .filter(Boolean);
+    if (messages.length > 0) return messages.join(" • ");
   }
 
-  if (typeof data.message === "string" && data.message.length > 0) {
+  if (typeof detail === "string" && detail.length > 0) return detail;
+  if (typeof data.message === "string" && data.message.length > 0)
     return data.message;
-  }
 
-  return getStatusMessage(status) || DEFAULT_ERROR_MESSAGE;
+  return "خطای غیرمنتظره‌ای رخ داد.";
 };
 
+// ==========================================
+// Token Refresh Queue Logic
+// ==========================================
 type QueueItem = {
-  resolve: (value: unknown) => void;
-  reject: (reason: unknown) => void;
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
 };
 
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 
-const processQueue = (token: string | null, error: unknown) => {
-  failedQueue.forEach(({ resolve, reject }) => {
+const processQueue = (error: unknown | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
     if (error) {
-      reject(error);
+      prom.reject(error);
     } else {
-      resolve(token);
+      prom.resolve(token);
     }
   });
   failedQueue = [];
 };
-
-const TOKEN_REFRESH_INTERCEPTOR_KEY = "__home_web_token_refresh_interceptor__";
-type TokenRefreshWindow = Window & {
-  __home_web_token_refresh_interceptor__?: boolean;
-};
+// ==========================================
 
 if (typeof window !== "undefined") {
-  const browserWindow = window as TokenRefreshWindow & AxiosToastWindow;
+  instance.interceptors.response.use(
+    (response) => {
+      const method = response.config?.method?.toUpperCase();
+      if (["POST", "PUT", "PATCH", "DELETE"].includes(method ?? "")) {
+        const data = response.data as Record<string, unknown> | undefined;
+        const message =
+          (data?.message as string | undefined) || "عملیات با موفقیت انجام شد.";
+        showClientSuccessToast(message);
+      }
+      return response;
+    },
+    async (error: unknown) => {
+      if (axios.isCancel(error)) {
+        return Promise.reject(error);
+      }
 
-  if (!browserWindow[TOKEN_REFRESH_INTERCEPTOR_KEY]) {
-    instance.interceptors.response.use(
-      (response) => response,
-      async (error: unknown) => {
-        if (!isAxiosError(error) || error.response?.status !== 401) {
-          return Promise.reject(error);
-        }
+      if (!isAxiosError(error)) return Promise.reject(error);
 
-        const originalRequest = error.config;
-        if (!originalRequest) {
-          return Promise.reject(error);
-        }
-        if (
-          (originalRequest as InternalAxiosRequestConfig & { _retry?: boolean })
-            ._retry
-        ) {
+      const originalRequest = error.config as InternalAxiosRequestConfig & {
+        _retry?: boolean;
+      };
+
+      if (error.response?.status === 401 && originalRequest) {
+        if (originalRequest._retry) {
           return Promise.reject(error);
         }
 
         if (isRefreshing) {
-          return new Promise<string | null>((resolve, reject) => {
-            failedQueue.push({ resolve: resolve as (value: unknown) => void, reject });
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
           })
             .then(() => instance(originalRequest))
-            .catch((queueError) => Promise.reject(queueError));
+            .catch((err) => Promise.reject(err));
         }
 
-        (
-          originalRequest as InternalAxiosRequestConfig & { _retry?: boolean }
-        )._retry = true;
+        originalRequest._retry = true;
         isRefreshing = true;
 
         try {
@@ -182,69 +134,25 @@ if (typeof window !== "undefined") {
           });
 
           if (!refreshResponse.ok) {
-            throw new Error("Refresh failed");
+            throw new Error("Refresh token expired or invalid");
           }
 
-          processQueue(null, null);
+          processQueue(null);
           return instance(originalRequest);
-        } catch {
-          processQueue(null, new Error("Refresh failed"));
+        } catch (refreshError) {
+          processQueue(refreshError);
           window.location.href = "/login";
           return Promise.reject(error);
         } finally {
           isRefreshing = false;
         }
-      },
-    );
+      }
 
-    browserWindow[TOKEN_REFRESH_INTERCEPTOR_KEY] = true;
-  }
-
-  if (!browserWindow[TOAST_INTERCEPTOR_KEY]) {
-    instance.interceptors.response.use(
-      (response) => response,
-      (error: unknown) => {
-        if (isAxiosError(error) && error.response?.status === 401) {
-          return Promise.reject(error);
-        }
-
-        if (
-          isAxiosError(error) &&
-          error.config &&
-          (error.config as InternalAxiosRequestConfig & { _retry?: boolean })
-            ._retry
-        ) {
-          return Promise.reject(error);
-        }
-
-        const message = extractErrorMessage(error);
-        showClientErrorToast(message);
-        return Promise.reject(error);
-      },
-    );
-
-    browserWindow[TOAST_INTERCEPTOR_KEY] = true;
-  }
-
-  if (!browserWindow[SUCCESS_INTERCEPTOR_KEY]) {
-    instance.interceptors.response.use(
-      (response) => {
-        const method = response.config?.method?.toUpperCase();
-        if (["POST", "PUT", "PATCH", "DELETE"].includes(method ?? "")) {
-          const data = response.data as Record<string, unknown> | undefined;
-          const message =
-            (data?.message as string | undefined) ||
-            getStatusMessage(response.status) ||
-            SUCCESS_MESSAGE_DEFAULT;
-          showClientSuccessToast(message);
-        }
-        return response;
-      },
-      (error) => Promise.reject(error),
-    );
-
-    browserWindow[SUCCESS_INTERCEPTOR_KEY] = true;
-  }
+      const message = extractError(error);
+      showClientErrorToast(message);
+      return Promise.reject(error);
+    },
+  );
 }
 
 const getClientCookie = (name: string): string | null => {
@@ -325,10 +233,7 @@ const toHeaders = (input: unknown): Headers => {
   }
 
   for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
-    if (value === undefined || value === null) {
-      continue;
-    }
-
+    if (value === undefined || value === null) continue;
     headers.set(key, Array.isArray(value) ? value.join(", ") : String(value));
   }
 

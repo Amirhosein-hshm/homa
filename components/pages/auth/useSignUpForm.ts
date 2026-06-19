@@ -18,7 +18,7 @@ export function useSignUpForm() {
     signUpSchema as unknown as Parameters<typeof zodResolver>[0],
   ) as unknown as Resolver<SignUpInput>;
 
-  const { mutateAsync, isPending } = useRegisterUserUsersRegisterPost({
+  const { mutate, isPending } = useRegisterUserUsersRegisterPost({
     mutation: {
       onSuccess: () => {
         router.replace("/login");
@@ -44,7 +44,7 @@ export function useSignUpForm() {
   });
 
   const onValidSubmit: SubmitHandler<SignUpInput> = (data) => {
-    mutateAsync({
+    mutate({
       data: {
         first_name: data.first_name,
         last_name: data.last_name,

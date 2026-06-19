@@ -17,7 +17,7 @@ export function useLoginForm() {
     loginSchema as unknown as Parameters<typeof zodResolver>[0],
   ) as unknown as Resolver<LoginInput>;
 
-  const { mutateAsync, isPending } = useLoginUserUsersLoginPost({
+  const { mutate, isPending } = useLoginUserUsersLoginPost({
     mutation: {
       onSuccess: async (response: LoginUserUsersLoginPostMutationResult) => {
         if (response.status !== 200) {
@@ -59,7 +59,7 @@ export function useLoginForm() {
   });
 
   const onValidSubmit: SubmitHandler<LoginInput> = (data) => {
-    mutateAsync({ data: { username: data.username, password: data.password } });
+    mutate({ data: { username: data.username, password: data.password } });
   };
 
   return {
