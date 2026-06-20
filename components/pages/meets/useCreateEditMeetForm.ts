@@ -1,6 +1,6 @@
 "use client";
 
-import { useCreateMeetMeetsPost, useUpdateMeetMeetsMeetHashPut } from "@/lib/generated/hooks/meets";
+import { getGetMeetByHashMeetsMeetHashGetQueryKey, useCreateMeetMeetsPost, useUpdateMeetMeetsMeetHashPut } from "@/lib/generated/hooks/meets";
 import {
   createMeetFormSchema,
   transformFormToApi,
@@ -61,12 +61,15 @@ export function useCreateEditMeetForm({
   const invalidateMeets = () => {
     queryClient.invalidateQueries({ queryKey: ["/meets"] });
     queryClient.invalidateQueries({ queryKey: ["/users/me"] });
+    queryClient.invalidateQueries({ queryKey: ["/users/me/invitations"] });
+    queryClient.invalidateQueries({ queryKey: ["/users/me/managed-meets"] });
   };
 
   const { mutate: createMeet, isPending: isCreating } = useCreateMeetMeetsPost({
     mutation: {
       onSuccess: () => {
         invalidateMeets();
+        resetForm();
         onSuccess();
       },
     },
@@ -76,12 +79,24 @@ export function useCreateEditMeetForm({
     mutation: {
       onSuccess: () => {
         invalidateMeets();
+        if (editMeetHash) {
+          queryClient.invalidateQueries({ queryKey: getGetMeetByHashMeetsMeetHashGetQueryKey(editMeetHash) });
+        }
+        resetForm();
         onSuccess();
       },
     },
   });
 
   const isPending = isCreating || isUpdating;
+
+  const resetForm = () =>
+    reset({
+      title: "",
+      start_time: "",
+      expires_at: "",
+      guest_usernames: [],
+    });
 
   const onValidSubmit: SubmitHandler<CreateMeetFormInput> = (data) => {
     const apiData = transformFormToApi(data);
@@ -112,12 +127,6 @@ export function useCreateEditMeetForm({
     isPending: isPending || isSubmitting,
     isValid,
     onSubmit: handleSubmit(onValidSubmit),
-    resetForm: () =>
-      reset({
-        title: "",
-        start_time: "",
-        expires_at: "",
-        guest_usernames: [],
-      }),
+    resetForm,
   };
 }

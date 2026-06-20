@@ -2,6 +2,7 @@
 
 import {
   getGetCurrentUserProfileUsersMeGetQueryKey,
+  getGetUserByUsernameUsersByUsernameUsernameGetQueryKey,
   getListUsersUsersGetQueryKey,
   useGetCurrentUserProfileUsersMeGet,
   useGetUserByUsernameUsersByUsernameUsernameGet,
@@ -90,6 +91,7 @@ export default function UserProfilePage() {
         if (response.status === 200) {
           queryClient.invalidateQueries({ queryKey: getGetCurrentUserProfileUsersMeGetQueryKey() });
           queryClient.invalidateQueries({ queryKey: getListUsersUsersGetQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetUserByUsernameUsersByUsernameUsernameGetQueryKey(username) });
           setEditing(false);
         }
       },

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/proxy/:path*",
-        destination: "http://127.0.0.1:8000/:path*",
+        destination: `${process.env.API_BASE_URL_SERVER || "http://127.0.0.1:8000"}/:path*`,
       },
     ];
   },

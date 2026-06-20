@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useDeleteUserUsersUserIdDelete } from "@/lib/generated/hooks";
-import { getListUsersUsersGetQueryKey } from "@/lib/generated/endpoints/users/users";
+import { getGetCurrentUserProfileUsersMeGetQueryKey, getListUsersUsersGetQueryKey } from "@/lib/generated/endpoints/users/users";
 import { useQueryClient } from "@tanstack/react-query";
 
 type DeleteUserDialogProps = {
@@ -35,6 +35,9 @@ export function DeleteUserDialog({
         if (response.status === 200) {
           queryClient.invalidateQueries({
             queryKey: getListUsersUsersGetQueryKey(),
+          });
+          queryClient.invalidateQueries({
+            queryKey: getGetCurrentUserProfileUsersMeGetQueryKey(),
           });
           onOpenChange(false);
         }

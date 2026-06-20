@@ -28,6 +28,8 @@ export default function DeleteMeetDialog({ meet, open, onOpenChange }: DeleteMee
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["/meets"] });
         queryClient.invalidateQueries({ queryKey: ["/users/me"] });
+        queryClient.invalidateQueries({ queryKey: ["/users/me/invitations"] });
+        queryClient.invalidateQueries({ queryKey: ["/users/me/managed-meets"] });
         onOpenChange(false);
       },
     },

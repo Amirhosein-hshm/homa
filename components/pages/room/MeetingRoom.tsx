@@ -37,7 +37,7 @@ function FarsiConnectionStateToast() {
 
   if (connectionState === ConnectionState.Connected) return null;
 
-  const map: Record<number, string> = {
+  const map: Record<string, string> = {
     [ConnectionState.Connecting]: "در حال اتصال...",
     [ConnectionState.Disconnected]: "قطع شد",
     [ConnectionState.Reconnecting]: "در حال اتصال مجدد...",

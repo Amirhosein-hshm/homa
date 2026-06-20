@@ -2,6 +2,7 @@
 
 import {
   getGetCurrentUserProfileUsersMeGetQueryKey,
+  getListUsersUsersGetQueryKey,
   useGetCurrentUserProfileUsersMeGet,
   useUpdateUserUsersUserIdPut,
 } from "@/lib/generated/hooks";
@@ -51,6 +52,7 @@ export function useMyProfileForm() {
       onSuccess: (response) => {
         if (response.status === 200) {
           queryClient.invalidateQueries({ queryKey: getGetCurrentUserProfileUsersMeGetQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getListUsersUsersGetQueryKey() });
           router.push(`/profile/${form.getValues("username")}`);
         }
       },

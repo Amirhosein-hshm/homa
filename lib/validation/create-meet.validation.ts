@@ -18,6 +18,6 @@ export function transformFormToApi(data: CreateMeetFormInput) {
     title: data.title.trim(),
     start_time: data.start_time,
     expires_at: data.expires_at,
-    guest_usernames: data.guest_usernames.filter(Boolean),
+    guest_usernames: (data.guest_usernames ?? []).filter(Boolean),
   };
 }
